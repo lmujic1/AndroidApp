@@ -14,7 +14,7 @@
         android:layout_marginStart="15dp"
         android:layout_marginTop="15dp"
         android:layout_marginEnd="15dp"
-        android:background="#FFFFFF"
+        android:background="#ffffff"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -26,22 +26,39 @@
         android:layout_marginStart="15dp"
         android:layout_marginTop="2dp"
         android:layout_marginEnd="15dp"
-        android:background="#FFFFFF"
+        android:background="#ffffff"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tVAmount" />
 
-    <Spinner
-        android:id="@+id/sFilterBy"
+    <LinearLayout
+        android:id="@+id/spinner1"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="15dp"
         android:layout_marginTop="5dp"
         android:layout_marginEnd="15dp"
+        android:background="#64BEDC"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tVLimit" />
+        app:layout_constraintTop_toBottomOf="@+id/tVLimit">
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="1dp"
+            android:layout_marginTop="1dp"
+            android:layout_marginEnd="1dp"
+            android:layout_marginBottom="1dp"
+            android:background="#ffffff">
+
+            <Spinner
+                android:id="@+id/sFilterBy"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#000000" />
+        </LinearLayout>
+    </LinearLayout>
 
     <ImageButton
         android:id="@+id/iVLijevo"
@@ -53,23 +70,35 @@
         android:background="#a5cfdd"
         android:clickable="true"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/sFilterBy"
+        app:layout_constraintTop_toBottomOf="@+id/spinner1"
         app:srcCompat="@drawable/left_foreground" />
 
-    <TextView
-        android:id="@+id/tVDatum"
+    <LinearLayout
+        android:id="@+id/datum"
         android:layout_width="0dp"
         android:layout_height="30dp"
         android:layout_marginStart="5dp"
         android:layout_marginTop="5dp"
         android:layout_marginEnd="5dp"
-        android:background="#ffffff"
-        android:gravity="center"
-        android:text="TextView"
-        android:textColor="#000000"
+        android:background="#64BEDC"
         app:layout_constraintLeft_toRightOf="@+id/iVLijevo"
         app:layout_constraintRight_toLeftOf="@+id/iVDesno"
-        app:layout_constraintTop_toBottomOf="@+id/sFilterBy" />
+        app:layout_constraintTop_toBottomOf="@+id/spinner1">
+
+        <TextView
+            android:id="@+id/tVDatum"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="1dp"
+            android:layout_marginStart="1dp"
+            android:layout_marginEnd="1dp"
+            android:layout_marginBottom="1dp"
+            android:background="#ffffff"
+            android:gravity="center"
+            android:text="TextView"
+            android:textColor="#000000"
+            android:textSize="18sp" />
+    </LinearLayout>
 
     <ImageButton
         android:id="@+id/iVDesno"
@@ -77,22 +106,46 @@
         android:layout_height="30dp"
         android:layout_marginTop="5dp"
         android:layout_marginEnd="15dp"
-        android:clickable="true"
         android:background="#a5cfdd"
+        android:clickable="true"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/sFilterBy"
+        app:layout_constraintTop_toBottomOf="@+id/spinner1"
         app:srcCompat="@drawable/right_foreground" />
 
-    <Spinner
-        android:id="@+id/sSortBy"
+    <LinearLayout
+        android:id="@+id/spinner2"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="15dp"
         android:layout_marginTop="5dp"
         android:layout_marginEnd="15dp"
+        android:background="#64BEDC"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tVDatum" />
+        app:layout_constraintTop_toBottomOf="@+id/datum">
+
+        <LinearLayout
+
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="1dp"
+            android:layout_marginTop="1dp"
+            android:layout_marginEnd="1dp"
+            android:layout_marginBottom="1dp"
+            android:background="#ffffff">
+
+            <Spinner
+                android:id="@+id/sSortBy"
+                android:layout_width="match_parent"
+
+                android:layout_height="wrap_content"
+                android:layout_marginStart="1dp"
+                android:layout_marginTop="1dp"
+                android:layout_marginEnd="1dp"
+                android:layout_marginBottom="1dp"
+                android:backgroundTint="#000000" />
+        </LinearLayout>
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/lLLista"
@@ -102,17 +155,22 @@
         android:layout_marginTop="5dp"
         android:layout_marginEnd="15dp"
         android:layout_marginBottom="5dp"
-        android:background="#ffffff"
+        android:background="#64BEDC"
         android:orientation="vertical"
         app:layout_constraintBottom_toTopOf="@+id/bDodajTransakciju"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/sSortBy">
+        app:layout_constraintTop_toBottomOf="@+id/spinner2">
 
         <ListView
             android:id="@+id/lVTransakcije"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:layout_marginStart="1dp"
+            android:layout_marginTop="1dp"
+            android:layout_marginEnd="1dp"
+            android:layout_marginBottom="1dp"
+            android:background="#ffffff">
 
         </ListView>
     </LinearLayout>
