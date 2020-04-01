@@ -10,4 +10,8 @@ public class TransactionListInteractor {
     public ArrayList<Transaction> get() {
         return TransactionModel.getTransactions();
     }
+
+    public void deleteTransaction(Transaction transaction) {
+        TransactionModel.deleteTransaction(transaction);
+    }
 }

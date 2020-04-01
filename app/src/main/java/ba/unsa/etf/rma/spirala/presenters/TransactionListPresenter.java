@@ -18,4 +18,7 @@ public class TransactionListPresenter {
         return transactionListInteractor.get();
     }
 
+    public void deleteTransaction(Transaction transaction) {
+        transactionListInteractor.deleteTransaction(transaction);
+    }
 }

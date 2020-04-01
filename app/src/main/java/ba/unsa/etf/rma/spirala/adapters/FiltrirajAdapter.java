@@ -66,8 +66,9 @@ public class FiltrirajAdapter extends BaseAdapter {
             case "Regular income":
                 ikonaKategorije.setImageResource(R.drawable.regular_income);
                 break;
-            default:
-               // ikonaKategorije.setImageResource(R.drawable.transaction);
+             case "All transactions":
+                ikonaKategorije.setImageResource(R.drawable.transaction);
+                break;
         }
         return view;
     }

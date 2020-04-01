@@ -29,10 +29,10 @@ public class TransactionModel {
                     new Transaction(getDate(2019,1,29),-70, "Režije", Transaction.Type.REGULARPAYMENT, "Struja, grijanje",30, getDate(2021,1,26)),
                     new Transaction(getDate(2020,1,29),30, "Ušteđevina", Transaction.Type.REGULARINCOME, "Za odmor",20, getDate(2020,7,30)),
                     new Transaction(getDate(2019,8,24),150, "Bajram", Transaction.Type.INDIVIDUALINCOME, null,0,null),
-                    new Transaction(getDate(2020,1,13),300, "pohod", Transaction.Type.INDIVIDUALINCOME, null,0,null),
+                    new Transaction(getDate(2020,1,13),300, "Pohod", Transaction.Type.INDIVIDUALINCOME, null,0,null),
                     new Transaction(getDate(2019,12,13),-70, "Odjeca", Transaction.Type.PURCHASE, "-",0,null),
-                    new Transaction(getDate(2020,1,17),20, "pohod", Transaction.Type.INDIVIDUALINCOME, null,0,null),
-                    new Transaction(getDate(2019,2,27),20, "pohod", Transaction.Type.INDIVIDUALINCOME, null,0,null))
+                    new Transaction(getDate(2020,1,17),20, "Pohod", Transaction.Type.INDIVIDUALINCOME, null,0,null),
+                    new Transaction(getDate(2019,2,27),20, "Pohod", Transaction.Type.INDIVIDUALINCOME, null,0,null))
     );
 
     private static Date getDate(int year, int month, int day) {
@@ -48,5 +48,9 @@ public class TransactionModel {
     }
     public static ArrayList<Transaction> getTransactions() {
         return transactions;
+    }
+
+    public static void deleteTransaction(Transaction transaction) {
+        transactions.remove(transaction);
     }
 }

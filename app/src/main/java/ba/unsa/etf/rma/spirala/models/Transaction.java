@@ -3,10 +3,14 @@ package ba.unsa.etf.rma.spirala.models;
 import androidx.annotation.NonNull;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.Date;
 
 public class Transaction implements Serializable {
+
+
     public enum Type {
         INDIVIDUALPAYMENT("Individual payment"),
         REGULARPAYMENT("Regular payment"),
@@ -52,6 +56,11 @@ public class Transaction implements Serializable {
         return date;
     }
 
+    public String getDate1(Date date) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd. MMMM, yyyy");
+        String d = dateFormat.format(date);
+        return d;
+    }
     public void setDate(Date date) {
         this.date = date;
     }
@@ -98,9 +107,9 @@ public class Transaction implements Serializable {
     }
 
     public void setTransactionInterval(int transactionInterval) {
+        this.transactionInterval = 0;
         if (type == Type.REGULARINCOME || type == Type.REGULARPAYMENT)
             this.transactionInterval = transactionInterval;
-        else this.transactionInterval = 0;
     }
 
     public Date getEndDate() {

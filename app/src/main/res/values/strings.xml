@@ -1,3 +1,13 @@
 <resources>
     <string name="app_name">Spirala</string>
+    <string name="add_transaction">Add transaction</string>
+    <string name="citat">“That man is richest whose pleasures are cheapest.”</string>
+    <string name="pisac">Henry David Thoreau</string>
+    <string name="type_of_transaction">Type of transaction</string>
+    <string name="description">Description</string>
+    <string name="date_of_transaction">Date of transaction</string>
+    <string name="transaction_interval">Transaction interval</string>
+    <string name="end_date">End date</string>
+    <string name="save">Save</string>
+    <string name="delete">Delete</string>
 </resources>
