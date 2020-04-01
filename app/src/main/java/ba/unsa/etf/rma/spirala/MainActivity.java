@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -34,8 +35,17 @@ import ba.unsa.etf.rma.spirala.models.Account;
 import ba.unsa.etf.rma.spirala.models.Transaction;
 import ba.unsa.etf.rma.spirala.presenters.TransactionListPresenter;
 
-public class MainActivity extends AppCompatActivity {
+/**
+ *
+ * @AUTOR : Lejla Mujic (18257)
+ *
+ * @NAPOMENA : Neke funkcionalnosti, poput dodavanja transakcija radjene su pod pretpostavkom da ce korisnik unijeti ispravne podatke.
+ *
+ * @p.s. Autor je svjestan grešaka nastalih u toku izrade i nastojat će ih ispravitit do kraja roka sljedeće spirale :)
+ *
+ * */
 
+public class MainActivity extends AppCompatActivity {
     private TextView tVAmount;
     private TextView tVLimit;
     private Spinner sFilriraj;
@@ -84,6 +94,7 @@ public class MainActivity extends AppCompatActivity {
     };
 
 
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -92,6 +103,9 @@ public class MainActivity extends AppCompatActivity {
 
         listaTransakcija.addAll(transakcijeZaMjesec(transactionListPresenter.getTransactions(), datum));
         listaTransakcijaNakonBrisanja.addAll(listaTransakcija);
+
+        account = new Account(5000,1500,700);
+
 
         tVAmount = (TextView) findViewById(R.id.tVAmount);
         tVLimit = (TextView) findViewById(R.id.tVLimit);
@@ -103,8 +117,8 @@ public class MainActivity extends AppCompatActivity {
         lVTransakcije = (ListView) findViewById(R.id.lVTransakcije);
         dodajTransakciju = (Button) findViewById(R.id.bDodajTransakciju);
 
-        tVAmount.setText("Global amount: ");
-        tVLimit.setText("Limit: ");
+        tVAmount.setText("Global amount:  " + String.format("%.2f",account.getBudget()));
+        tVLimit.setText("Limit:  " + String.format("%.2f",account.getTotalLimit()));
 
 
         transactionListAdapter = new TransactionListAdapter(this, R.layout.lista_transakcija, listaTransakcija);
@@ -225,6 +239,8 @@ public class MainActivity extends AppCompatActivity {
                 SimpleDateFormat format = new SimpleDateFormat("dd. MMMM, yyyy");
                 Transaction nova = new Transaction();
 
+
+
                 title = data.getStringExtra("title");
                 type = data.getStringExtra("type");
                 description = data.getStringExtra("itemDescription");
@@ -232,6 +248,10 @@ public class MainActivity extends AppCompatActivity {
                 interval = data.getIntExtra("interval",0);
                 endDate = data.getStringExtra("endDate");
                 amount = data.getDoubleExtra("amount",0);
+
+                account.setBudget(account.getBudget()+amount);
+                tVAmount.setText("Global amount:  " + String.format("%.2f",account.getBudget()));
+                //tVLimit.setText("Limit:  " + String.format("%.2f",account.getTotalLimit()));
 
                 switch (type) {
                     case "Individual payment":
