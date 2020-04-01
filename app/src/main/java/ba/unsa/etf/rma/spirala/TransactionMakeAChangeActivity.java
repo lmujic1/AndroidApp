@@ -1,16 +1,15 @@
 package ba.unsa.etf.rma.spirala;
 
-import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.text.Editable;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.TextView;
+import android.widget.EditText;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
@@ -18,8 +17,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import ba.unsa.etf.rma.spirala.models.Transaction;
 
-public class AddTransactionActivity extends AppCompatActivity {
-    private TextView format;
+public class TransactionMakeAChangeActivity extends AppCompatActivity {
+
     private EditText titleTransakcije;
     private EditText typeTransakcije;
     private EditText opisTransakcije;
@@ -38,11 +37,29 @@ public class AddTransactionActivity extends AppCompatActivity {
     private int interval;
     private double amount;
 
-    @SuppressLint("SetTextI18n")
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.transaction_make_a_change);
+
+        Bundle bundle = getIntent().getExtras();
+        if (bundle != null
+                && bundle.containsKey("title")
+                && bundle.containsKey("type")
+                && bundle.containsKey("itemDescription")
+                && bundle.containsKey("date")
+                && bundle.containsKey("interval")
+                && bundle.containsKey("endDate")
+                && bundle.containsKey("amount")) {
+
+            title = bundle.getString("title");
+            type = bundle.getString("type");
+            description = bundle.getString("itemDescription");
+            date = bundle.getString("date");
+            interval = bundle.getInt("interval");
+            endDate = bundle.getString("endDate");
+            amount = bundle.getDouble("amount");
+        }
 
         titleTransakcije = (EditText) findViewById(R.id.iTitleTransakcije);
         typeTransakcije = (EditText) findViewById(R.id.iTypeTransakcije);
@@ -54,9 +71,15 @@ public class AddTransactionActivity extends AppCompatActivity {
         iconTransakcije = (ImageView) findViewById(R.id.iIconTransakcije);
         saveButton = (Button) findViewById(R.id.iSaveButton);
         deleteButton = (Button) findViewById(R.id.iDeleteButton);
-        format = (TextView) findViewById(R.id.format);
 
-        format.setText("Date of transaction (format: dd. MMMM, yyyy)");
+
+        titleTransakcije.setText(title);
+        typeTransakcije.setText(type);
+        opisTransakcije.setText(description);
+        dateTransakcije.setText(date);
+        intervalTransakcije.setText(String.format("%d",interval));
+        iznosTransakcije.setText(String.format("%.2f",amount));
+        endTransakcije.setText(endDate);
 
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -69,7 +92,7 @@ public class AddTransactionActivity extends AppCompatActivity {
                     else
                         titleTransakcije.setBackgroundColor(Color.GREEN);
                 }
-                if(!String.valueOf(typeTransakcije.getText()).equals(type)) {
+               if(!String.valueOf(typeTransakcije.getText()).equals(type)) {
                     if(!validirajType(typeTransakcije.getText()))
                         typeTransakcije.setBackgroundColor(Color.RED);
                     else
@@ -85,30 +108,13 @@ public class AddTransactionActivity extends AppCompatActivity {
                     endTransakcije.setBackgroundColor(Color.GREEN);
                 if(!String.valueOf(iznosTransakcije.getText()).equals(String.valueOf(amount)))
                     iznosTransakcije.setBackgroundColor(Color.GREEN);
-
-                Intent intent = new Intent();
-                Bundle bundle = new Bundle();
-                bundle.putString("title", String.valueOf(titleTransakcije.getText()));
-                bundle.putString("type", String.valueOf(typeTransakcije.getText()));
-                bundle.putString("itemDescription", String.valueOf(opisTransakcije.getText()));
-
-                bundle.putString("date", String.valueOf(dateTransakcije.getText()));
-                int interv = 0;
-                if(String.valueOf(intervalTransakcije.getText()).equals("") || String.valueOf(intervalTransakcije.getText())==null)  bundle.putInt("interval", interv);
-                else bundle.putInt("interval", Integer.parseInt(String.valueOf(intervalTransakcije.getText())));
-                bundle.putString("endDate", String.valueOf(endTransakcije.getText()));
-                bundle.putDouble("amount", Double.parseDouble(String.valueOf(iznosTransakcije.getText())));
-
-                intent.putExtras(bundle);
-                setResult(20,intent);
-                finish();
             }
         });
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
         deleteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final AlertDialog.Builder builder = new AlertDialog.Builder(AddTransactionActivity.this);
+                final AlertDialog.Builder builder = new AlertDialog.Builder(TransactionMakeAChangeActivity.this);
                 builder.setTitle("Select your answer.");
                 builder.setMessage("Want to delete transaction?");
                 DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {

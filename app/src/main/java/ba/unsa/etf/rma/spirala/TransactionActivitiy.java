@@ -15,6 +15,9 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.util.Calendar;
+import java.util.Date;
+
 import ba.unsa.etf.rma.spirala.models.Transaction;
 import ba.unsa.etf.rma.spirala.presenters.TransactionListPresenter;
 
@@ -27,8 +30,10 @@ public class TransactionActivitiy extends AppCompatActivity {
     private TextView endTransakcije;
     private TextView iznosTransakcije;
     private ImageView iconTransakcije;
+    private TextView ukupniIznosTransakcije;
     private Button saveButton;
     private Button deleteButton;
+
     private Transaction transaction;
 
 
@@ -45,6 +50,7 @@ public class TransactionActivitiy extends AppCompatActivity {
         intervalTransakcije = (TextView) findViewById(R.id.intervalTransakcije);
         endTransakcije = (TextView) findViewById(R.id.endTransakcije);
         iznosTransakcije = (TextView) findViewById(R.id.iznosTransakcije);
+        ukupniIznosTransakcije = (TextView) findViewById(R.id.UkupniIznosTransakcije);
         iconTransakcije = (ImageView) findViewById(R.id.iconTransakcije);
         saveButton = (Button) findViewById(R.id.saveButton);
         deleteButton = (Button) findViewById(R.id.deleteButton);
@@ -59,10 +65,15 @@ public class TransactionActivitiy extends AppCompatActivity {
         dateTransakcije.setText(transaction.getDate1(transaction.getDate()));
         intervalTransakcije.setText(String.format("%d",transaction.getTransactionInterval()));
         if (transaction.getEndDate() == null)
-            endTransakcije.setText(transaction.getDate1(transaction.getDate()));
+            //endTransakcije.setText(transaction.getDate1(transaction.getDate()));
+            endTransakcije.setText("-");
         else endTransakcije.setText(transaction.getDate1(transaction.getEndDate()));
-        iznosTransakcije.setText(String.format("%.2f", transaction.getAmount()));
 
+        int brojTrans = brojTransakcija(transaction.getDate(),transaction.getEndDate(),transaction.getTransactionInterval());
+
+        iznosTransakcije.setText(String.format("%.2f", transaction.getAmount()) + " x " + brojTrans + " = ");
+
+        ukupniIznosTransakcije.setText(String.format("%.2f", transaction.getAmount()*brojTrans));
         String tipTransakcije = transaction.getType().toString();
         switch (tipTransakcije) {
             case "Individual payment":
@@ -97,9 +108,10 @@ public class TransactionActivitiy extends AppCompatActivity {
                         switch(which){
                             case DialogInterface.BUTTON_POSITIVE:
                                 transactionListPresenter.deleteTransaction(transaction);
-                                Intent intent = new Intent(TransactionActivitiy.this, MainActivity.class);
-                                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                startActivity(intent);
+                                Intent intent = new Intent();//(TransactionActivitiy.this, MainActivity.class);
+                                //intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                setResult(10,intent);
+                                finish();
                                 break;
                             case DialogInterface.BUTTON_NEGATIVE:
                                 break;
@@ -113,6 +125,19 @@ public class TransactionActivitiy extends AppCompatActivity {
             }
         });
 
+    }
+
+    private int brojTransakcija(Date date, Date endDate, int transactionInterval) {
+        if(endDate == null) return 1;
+        Calendar cal1 = Calendar.getInstance();
+        Calendar cal2 = Calendar.getInstance();
+        cal1.setTime(date);
+        cal2.setTime(endDate);
+        long millis1 = cal1.getTimeInMillis();
+        long millis2 = cal2.getTimeInMillis();
+        long diff = millis2 - millis1;
+        long diffDays = diff / (24 * 60 * 60 * 1000) ;
+        return (int) (diffDays/(transactionInterval))+1;
     }
 
 

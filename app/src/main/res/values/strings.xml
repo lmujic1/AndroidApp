@@ -10,4 +10,6 @@
     <string name="end_date">End date</string>
     <string name="save">Save</string>
     <string name="delete">Delete</string>
+    <string name="title_of_transaction">Title of transaction</string>
+    <string name="amount">Amount x number of transaction</string>
 </resources>

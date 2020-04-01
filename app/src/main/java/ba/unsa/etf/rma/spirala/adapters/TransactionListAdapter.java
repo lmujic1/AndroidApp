@@ -158,4 +158,13 @@ public class TransactionListAdapter extends ArrayAdapter<Transaction> {
         notifyDataSetChanged();
     }
 
+    public void izbrisiTransakciju(Transaction izabranaTransakcija) {
+        transakcije.remove(izabranaTransakcija);
+        notifyDataSetChanged();
+    }
+
+    public void dodajTransakciju(Transaction nova) {
+        transakcije.add(nova);
+        notifyDataSetChanged();
+    }
 }

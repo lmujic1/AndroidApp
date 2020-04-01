@@ -1,5 +1,7 @@
 package ba.unsa.etf.rma.spirala;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
@@ -28,6 +30,7 @@ import java.util.stream.Collectors;
 import ba.unsa.etf.rma.spirala.adapters.FiltrirajAdapter;
 import ba.unsa.etf.rma.spirala.adapters.SpinnerAdapter;
 import ba.unsa.etf.rma.spirala.adapters.TransactionListAdapter;
+import ba.unsa.etf.rma.spirala.models.Account;
 import ba.unsa.etf.rma.spirala.models.Transaction;
 import ba.unsa.etf.rma.spirala.presenters.TransactionListPresenter;
 
@@ -49,23 +52,37 @@ public class MainActivity extends AppCompatActivity {
 
     public TransactionListAdapter transactionListAdapter;
     private TransactionListPresenter transactionListPresenter = new TransactionListPresenter();
-    private ArrayList<Transaction> listaTransakcija= new ArrayList<>();
+    private ArrayList<Transaction> listaTransakcija = new ArrayList<>(), listaTransakcijaNakonBrisanja = new ArrayList<>();
 
+    private Transaction izabranaTransakcija;
+    private Account account;
+
+    //za datum
     private Date datum = new Date();
     private static SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM, yyyy");
 
+    //otvaranje aktivnosti na KRATKI klik na transakciju
     private AdapterView.OnItemClickListener listaTransakcijaCLickListener =
             new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    Intent transactionDetailIntent = new Intent(MainActivity.this, TransactionActivitiy.class);
                     Transaction transaction = transactionListAdapter.getTransaction(position);
-
-                    transactionDetailIntent.putExtra("title", transaction.getTitle());
-                    transactionDetailIntent.putExtra("Transaction", transaction);
-                    MainActivity.this.startActivity(transactionDetailIntent);
+                    izabranaTransakcija = transactionListAdapter.getTransaction(position);
+                    showTheTransaction(transaction);
                 }
             };
+
+    //otvaranje aktivnosti za DUGI klik na transakciju - omogucene izmjene
+    private AdapterView.OnItemLongClickListener listaTransakcijaLongClickListener = new AdapterView.OnItemLongClickListener() {
+        @Override
+        public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+            Transaction transaction = transactionListAdapter.getTransaction(position);
+            izabranaTransakcija = transactionListAdapter.getTransaction(position);
+            makeAChange(transaction);
+            return true;
+        }
+    };
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,7 +90,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
 
-        listaTransakcija.addAll(transakcijeZaMjesec(transactionListPresenter.getTransactions(),datum));
+        listaTransakcija.addAll(transakcijeZaMjesec(transactionListPresenter.getTransactions(), datum));
+        listaTransakcijaNakonBrisanja.addAll(listaTransakcija);
 
         tVAmount = (TextView) findViewById(R.id.tVAmount);
         tVLimit = (TextView) findViewById(R.id.tVLimit);
@@ -89,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
         tVLimit.setText("Limit: ");
 
 
-        transactionListAdapter = new TransactionListAdapter(this, R.layout.lista_transakcija,listaTransakcija);
+        transactionListAdapter = new TransactionListAdapter(this, R.layout.lista_transakcija, listaTransakcija);
         lVTransakcije.setAdapter(transactionListAdapter);
 
         listaFiltera = new ArrayList<>(Arrays.asList("Filter by", "All transactions", "Individual payment", "Regular payment", "Purchase", "Individual income", "Regular income"));
@@ -98,17 +116,18 @@ public class MainActivity extends AppCompatActivity {
         sFilriraj.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                listaTransakcija = transakcijeZaMjesec(transactionListPresenter.getTransactions(),datum);
-                transactionListAdapter = new TransactionListAdapter (context,R.layout.lista_transakcija,listaTransakcija);
+                listaTransakcija = transakcijeZaMjesec(transactionListPresenter.getTransactions(), datum);
+                transactionListAdapter = new TransactionListAdapter(context, R.layout.lista_transakcija, listaTransakcija);
                 lVTransakcije.setAdapter(transactionListAdapter);
                 String selectedItemText = (String) parent.getItemAtPosition(position);
-                if(!selectedItemText.equals("All transactions")) transactionListAdapter.filtriraj(selectedItemText);
+                if (!selectedItemText.equals("All transactions"))
+                    transactionListAdapter.filtriraj(selectedItemText);
             }
+
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
             }
         });
-
 
 
         listaSortiraj = new ArrayList<String>(Arrays.asList("Sort by", "Price - Ascending", "Price - Descending", "Title - Ascending", "Title - Descending", "Date - Ascending", "Date - Descending"));
@@ -120,12 +139,16 @@ public class MainActivity extends AppCompatActivity {
                 String selectedItemText = (String) parentView.getItemAtPosition(position);
                 transactionListAdapter.sortiraj(selectedItemText);
             }
+
             @Override
             public void onNothingSelected(AdapterView<?> parentView) {
             }
         });
 
+        lVTransakcije.setOnItemLongClickListener(listaTransakcijaLongClickListener);
+
         lVTransakcije.setOnItemClickListener(listaTransakcijaCLickListener);
+
 
         String date = dateFormat.format(datum);
         tVDatum.setText(date);
@@ -138,11 +161,11 @@ public class MainActivity extends AppCompatActivity {
                                               calendar.setTime(dat);
                                               calendar.add(Calendar.MONTH, -1);
                                               Date monthBefore = calendar.getTime();
-                                              datum=monthBefore;
+                                              datum = monthBefore;
                                               tVDatum.setText(dateFormat.format(monthBefore));
                                               listaTransakcija.clear();
-                                              listaTransakcija.addAll(transakcijeZaMjesec(transactionListPresenter.getTransactions(),monthBefore));
-                                              transactionListAdapter = new TransactionListAdapter(context, R.layout.lista_transakcija,listaTransakcija);
+                                              listaTransakcija.addAll(transakcijeZaMjesec(transactionListPresenter.getTransactions(), monthBefore));
+                                              transactionListAdapter = new TransactionListAdapter(context, R.layout.lista_transakcija, listaTransakcija);
                                               lVTransakcije.setAdapter(transactionListAdapter);
                                           }
                                       }
@@ -155,11 +178,11 @@ public class MainActivity extends AppCompatActivity {
                                                 calendar.setTime(dat);
                                                 calendar.add(Calendar.MONTH, 1);
                                                 Date monthAfter = calendar.getTime();
-                                                datum=monthAfter;
+                                                datum = monthAfter;
                                                 tVDatum.setText(dateFormat.format(monthAfter));
                                                 listaTransakcija.clear();
-                                                listaTransakcija.addAll(transakcijeZaMjesec(transactionListPresenter.getTransactions(),monthAfter));
-                                                transactionListAdapter = new TransactionListAdapter(context, R.layout.lista_transakcija,listaTransakcija);
+                                                listaTransakcija.addAll(transakcijeZaMjesec(transactionListPresenter.getTransactions(), monthAfter));
+                                                transactionListAdapter = new TransactionListAdapter(context, R.layout.lista_transakcija, listaTransakcija);
                                                 lVTransakcije.setAdapter(transactionListAdapter);
                                             }
                                         }
@@ -168,10 +191,80 @@ public class MainActivity extends AppCompatActivity {
         dodajTransakciju.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                Intent i = new Intent(MainActivity.this,AddTransactionActivity.class);
+                startActivityForResult(i,20);
             }
         });
 
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 10) {
+            listaTransakcijaNakonBrisanja.remove(izabranaTransakcija);
+            listaTransakcija.remove(izabranaTransakcija);
+            transactionListAdapter.izbrisiTransakciju(izabranaTransakcija);
+        } else if(requestCode == 20) {
+            if (data !=null
+                    && data.getExtras().containsKey("title")
+                    && data.getExtras().containsKey("type")
+                    && data.getExtras().containsKey("itemDescription")
+                    && data.getExtras().containsKey("date")
+                    && data.getExtras().containsKey("interval")
+                    && data.getExtras().containsKey("endDate")
+                    && data.getExtras().containsKey("amount")) {
+
+                String title;
+                String type;
+                String description;
+                String date;
+                String endDate;
+                int interval;
+                double amount;
+                SimpleDateFormat format = new SimpleDateFormat("dd. MMMM, yyyy");
+                Transaction nova = new Transaction();
+
+                title = data.getStringExtra("title");
+                type = data.getStringExtra("type");
+                description = data.getStringExtra("itemDescription");
+                date = data.getStringExtra("date");
+                interval = data.getIntExtra("interval",0);
+                endDate = data.getStringExtra("endDate");
+                amount = data.getDoubleExtra("amount",0);
+
+                switch (type) {
+                    case "Individual payment":
+                        nova.setType(Transaction.Type.INDIVIDUALPAYMENT);
+                        break;
+                    case "Regular payment":
+                        nova.setType(Transaction.Type.REGULARPAYMENT);
+                        break;
+                    case "Purchase":
+                        nova.setType(Transaction.Type.PURCHASE);
+                        break;
+                    case "Individual income":
+                        nova.setType(Transaction.Type.INDIVIDUALINCOME);
+                        break;
+                    case "Regular income":
+                        nova.setType(Transaction.Type.REGULARINCOME);
+                        break;
+                }
+                nova.setTitle(title);
+                nova.setItemDescription(description);
+                nova.setTransactionInterval(interval);
+                nova.setAmount(amount);
+                try {
+                    nova.setDate(format.parse(date));
+                    nova.setEndDate(format.parse(endDate));
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                transactionListAdapter.dodajTransakciju(nova);
+            }
+
+
+        }
     }
 
     private Date getDatum(String text) {
@@ -185,10 +278,7 @@ public class MainActivity extends AppCompatActivity {
         return datum;
     }
 
-
     private Context context = this;
-
-
 
     public ArrayList<Transaction> transakcijeZaMjesec(ArrayList<Transaction> transactions, Date date) {
         ArrayList<Transaction> trans = new ArrayList<>();
@@ -206,4 +296,38 @@ public class MainActivity extends AppCompatActivity {
 
         return trans;
     }
+
+
+    private void showTheTransaction(Transaction transaction) {
+        Intent transactionDetailIntent = new Intent(MainActivity.this, TransactionActivitiy.class);
+        transactionDetailIntent.putExtra("title", transaction.getTitle());
+        transactionDetailIntent.putExtra("Transaction", transaction);
+        startActivityForResult(transactionDetailIntent, 10);
+    }
+
+    private void makeAChange(Transaction transaction) {
+        Intent transactionDetailIntent = new Intent(MainActivity.this, TransactionMakeAChangeActivity.class);
+        Bundle b = new Bundle();
+        b.putString("title", transaction.getTitle());
+        b.putString("type", transaction.getType().toString());
+
+        if (transaction.getItemDescription() == null) {
+            String str = " ";
+            b.putString("itemDescription", str);
+        } else
+            b.putString("itemDescription", transaction.getItemDescription());
+
+        String d = transaction.getDate1(transaction.getDate()), ed;
+        if (transaction.getEndDate() == null) ed = " ";
+        else ed = transaction.getDate1(transaction.getEndDate());
+
+        b.putString("date", d);
+        b.putInt("interval", transaction.getTransactionInterval());
+        b.putString("endDate", ed);
+        b.putDouble("amount", transaction.getAmount());
+        transactionDetailIntent.putExtras(b);
+        startActivityForResult(transactionDetailIntent, 10);
+    }
+
+    // TODO: 1. 4. 2020. dodavanje nove transakcije - postaviti spinnere umjeto edittexa (type,datum), Save dugme - makeAChange (zavrsiti)
 }
