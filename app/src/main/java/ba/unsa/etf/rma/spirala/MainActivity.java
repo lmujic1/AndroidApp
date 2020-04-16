@@ -3,6 +3,8 @@ package ba.unsa.etf.rma.spirala;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -11,6 +13,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Spinner;
@@ -31,22 +34,20 @@ import java.util.stream.Collectors;
 import ba.unsa.etf.rma.spirala.adapters.FiltrirajAdapter;
 import ba.unsa.etf.rma.spirala.adapters.SpinnerAdapter;
 import ba.unsa.etf.rma.spirala.adapters.TransactionListAdapter;
+import ba.unsa.etf.rma.spirala.fragments.TransactionDetailFragment;
+import ba.unsa.etf.rma.spirala.fragments.TransactionListFragment;
 import ba.unsa.etf.rma.spirala.models.Account;
 import ba.unsa.etf.rma.spirala.models.Transaction;
 import ba.unsa.etf.rma.spirala.presenters.TransactionListPresenter;
 
 /**
- *
  * @AUTOR : Lejla Mujic (18257)
- *
  * @NAPOMENA : Neke funkcionalnosti, poput dodavanja transakcija radjene su pod pretpostavkom da ce korisnik unijeti ispravne podatke.
- *
  * @p.s. Autor je svjestan grešaka nastalih u toku izrade i nastojat će ih ispravitit do kraja roka sljedeće spirale :)
- *
- * */
+ */
 
-public class MainActivity extends AppCompatActivity {
-    private TextView tVAmount;
+public class MainActivity extends AppCompatActivity implements TransactionListFragment.OnItemClick {
+    /*private TextView tVAmount;
     private TextView tVLimit;
     private Spinner sFilriraj;
     private ImageButton datumPrije;
@@ -347,7 +348,69 @@ public class MainActivity extends AppCompatActivity {
         b.putDouble("amount", transaction.getAmount());
         transactionDetailIntent.putExtras(b);
         startActivityForResult(transactionDetailIntent, 10);
-    }
+    }*/
 
     // TODO: 1. 4. 2020. dodavanje nove transakcije - postaviti spinnere umjeto edittexa (type,datum), Save dugme - makeAChange (zavrsiti)
+
+    private boolean twoPaneMode;
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        FragmentManager fragmentManager = getSupportFragmentManager();
+
+        FrameLayout details = findViewById(R.id.detalji);
+        if (details != null) {
+            twoPaneMode = true;
+            TransactionDetailFragment detailFragment = (TransactionDetailFragment) fragmentManager.findFragmentById(R.id.detalji);
+            if (detailFragment == null) {
+                detailFragment = new TransactionDetailFragment();
+                fragmentManager.beginTransaction()
+                        .replace(R.id.detalji, detailFragment)
+                        .commit();
+            }
+        } else {
+            twoPaneMode = false;
+        }
+
+        Fragment pocetna = fragmentManager.findFragmentById(R.id.pocetna);
+        if (pocetna == null) {
+            pocetna = new TransactionListFragment();
+            fragmentManager.beginTransaction()
+                    .replace(R.id.pocetna, pocetna)
+                    .commit();
+        } else {
+            fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
+
+    @Override
+    public void onItemClicked(Transaction transaction) {
+        Bundle arguments = new Bundle();
+        arguments.putParcelable("transaction", transaction);
+        TransactionDetailFragment detailFragment = new TransactionDetailFragment();
+        detailFragment.setArguments(arguments);
+        if (twoPaneMode) {
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.detalji, detailFragment)
+                    .commit();
+        } else {
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.pocetna,detailFragment)
+                    .addToBackStack(null)
+                    .commit();
+        }
+    }
 }

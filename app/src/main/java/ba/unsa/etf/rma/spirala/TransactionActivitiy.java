@@ -37,7 +37,7 @@ public class TransactionActivitiy extends AppCompatActivity {
     private Transaction transaction;
 
 
-    private TransactionListPresenter transactionListPresenter=new TransactionListPresenter();
+    //private TransactionListPresenter transactionListPresenter=new TransactionListPresenter();
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -107,7 +107,7 @@ public class TransactionActivitiy extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int which) {
                         switch(which){
                             case DialogInterface.BUTTON_POSITIVE:
-                                transactionListPresenter.deleteTransaction(transaction);
+                                //transactionListPresenter.deleteTransaction(transaction);
                                 Intent intent = new Intent();//(TransactionActivitiy.this, MainActivity.class);
                                 //intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                                 setResult(10,intent);

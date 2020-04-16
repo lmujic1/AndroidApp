@@ -10,6 +10,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import ba.unsa.etf.rma.spirala.R;
 import ba.unsa.etf.rma.spirala.models.Transaction;
@@ -18,9 +19,10 @@ public class FiltrirajAdapter extends BaseAdapter {
     private Context context;
     private ArrayList<String> listaTipovaTransakcija;
 
-    public FiltrirajAdapter(Context context, ArrayList<String> listaTipovaTransakcija) {
+    public FiltrirajAdapter(Context context) {
         this.context = context;
-        this.listaTipovaTransakcija = listaTipovaTransakcija;
+        this.listaTipovaTransakcija = new ArrayList<>(Arrays.asList("Filter by", "All transactions", "Individual payment", "Regular payment", "Purchase", "Individual income", "Regular income"));
+        //= listaTipovaTransakcija;
     }
 
     @Override
@@ -66,7 +68,7 @@ public class FiltrirajAdapter extends BaseAdapter {
             case "Regular income":
                 ikonaKategorije.setImageResource(R.drawable.regular_income);
                 break;
-             case "All transactions":
+            case "All transactions":
                 ikonaKategorije.setImageResource(R.drawable.transaction);
                 break;
         }

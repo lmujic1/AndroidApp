@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -32,10 +33,10 @@ public class TransactionListAdapter extends ArrayAdapter<Transaction> {
     public TransactionListAdapter(@NonNull Context context, int resource, ArrayList<Transaction> transactions) {
 
         super(context, resource, transactions);
-        this.context = context;
+        //this.context = context;
         this.resource = resource;
-        this.transakcije = transactions;
-        this.pomocnalista = transactions;
+        //this.transakcije = transactions;
+        //this.pomocnalista = transactions;
     }
 
    /* @Override
@@ -45,22 +46,33 @@ public class TransactionListAdapter extends ArrayAdapter<Transaction> {
 */
 
     public Transaction getTransaction(int position) {
-        return transakcije.get(position);
+        return this.getItem(position);
     }
 
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-
+/*
         View view = convertView;
         if (view == null) {
             LayoutInflater li;
             li = LayoutInflater.from(context);
             view = li.inflate(R.layout.lista_transakcija, null);
+        }*/
+
+        LinearLayout view;
+        if(convertView == null) {
+            view = new LinearLayout(getContext());
+            String inflater = Context.LAYOUT_INFLATER_SERVICE;
+            LayoutInflater li;
+            li = (LayoutInflater) getContext().getSystemService(inflater);
+            li.inflate(resource,view,true);
+        } else {
+            view = (LinearLayout) convertView;
         }
 
         Transaction transaction = getItem(position);
-        if (transaction != null) {
+       // if (transaction != null) {
             TextView nTransakcije = view.findViewById(R.id.titleTransaction);
             TextView iTransakcije = view.findViewById(R.id.iznosTransakcije);
             ImageView ikonaTransakcije = view.findViewById(R.id.ikonaTransakcije);
@@ -86,15 +98,16 @@ public class TransactionListAdapter extends ArrayAdapter<Transaction> {
                 default:
                     ikonaTransakcije.setImageResource(R.drawable.transaction);
             }
-        }
+        //}
 
         return view;
     }
 
     public void sortiraj(String sortitajPo) {
+
         switch (sortitajPo) {
             case "Title - Ascending":
-                Collections.sort(transakcije, new Comparator<Transaction>() {
+                this.sort(new Comparator<Transaction>() {
                     @Override
                     public int compare(Transaction a, Transaction b) {
                         return a.getTitle().compareTo(b.getTitle());
@@ -102,7 +115,7 @@ public class TransactionListAdapter extends ArrayAdapter<Transaction> {
                 });
                 break;
             case "Title - Descending":
-                Collections.sort(transakcije, new Comparator<Transaction>() {
+                this.sort(new Comparator<Transaction>() {
                     @Override
                     public int compare(Transaction a, Transaction b) {
                         return -a.getTitle().compareTo(b.getTitle());
@@ -110,7 +123,7 @@ public class TransactionListAdapter extends ArrayAdapter<Transaction> {
                 });
                 break;
             case "Price - Ascending":
-                Collections.sort(transakcije, new Comparator<Transaction>() {
+                this.sort(new Comparator<Transaction>() {
                     @Override
                     public int compare(Transaction a, Transaction b) {
                         return Double.compare(a.getAmount(), b.getAmount());
@@ -118,7 +131,7 @@ public class TransactionListAdapter extends ArrayAdapter<Transaction> {
                 });
                 break;
             case "Price - Descending":
-                Collections.sort(transakcije, new Comparator<Transaction>() {
+                this.sort( new Comparator<Transaction>() {
                     @Override
                     public int compare(Transaction a, Transaction b) {
                         return -Double.compare(a.getAmount(), b.getAmount());
@@ -126,7 +139,7 @@ public class TransactionListAdapter extends ArrayAdapter<Transaction> {
                 });
                 break;
             case "Date - Ascending":
-                Collections.sort(transakcije, new Comparator<Transaction>() {
+                this.sort( new Comparator<Transaction>() {
                     @Override
                     public int compare(Transaction a, Transaction b) {
                         return a.getDate().compareTo(b.getDate());
@@ -134,7 +147,7 @@ public class TransactionListAdapter extends ArrayAdapter<Transaction> {
                 });
                 break;
             case "Date - Descending":
-                Collections.sort(transakcije, new Comparator<Transaction>() {
+                this.sort(new Comparator<Transaction>() {
                     @Override
                     public int compare(Transaction a, Transaction b) {
                         return -a.getDate().compareTo(b.getDate());
@@ -142,21 +155,8 @@ public class TransactionListAdapter extends ArrayAdapter<Transaction> {
                 });
                 break;
         }
-        notifyDataSetChanged();
     }
 
-    public void filtriraj(String filter) {
-        ArrayList<Transaction> filtrirani = new ArrayList<>();
-
-        if(transakcije.isEmpty()) {
-            System.out.println("prazna");
-            transakcije.addAll(pomocnalista);}
-        for (Transaction t : transakcije) {
-            if (!t.getType().toString().equals(filter)) filtrirani.add(t);
-        }
-        transakcije.removeAll(filtrirani);
-        notifyDataSetChanged();
-    }
 
     public void izbrisiTransakciju(Transaction izabranaTransakcija) {
         transakcije.remove(izabranaTransakcija);
@@ -166,5 +166,13 @@ public class TransactionListAdapter extends ArrayAdapter<Transaction> {
     public void dodajTransakciju(Transaction nova) {
         transakcije.add(nova);
         notifyDataSetChanged();
+    }
+
+    public void setTransactions(ArrayList<Transaction> transactions) {
+        this.addAll(transactions);
+    }
+
+    public void clearList() {
+        this.clear();
     }
 }

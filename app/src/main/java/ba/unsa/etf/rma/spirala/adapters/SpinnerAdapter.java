@@ -10,6 +10,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import ba.unsa.etf.rma.spirala.R;
 import ba.unsa.etf.rma.spirala.models.Transaction;
@@ -18,9 +19,10 @@ public class SpinnerAdapter extends BaseAdapter {
     private Context context;
     private ArrayList<String> listaTipovaTransakcija;
 
-    public SpinnerAdapter(Context context, ArrayList<String> listaTipovaTransakcija) {
+    public SpinnerAdapter(Context context) {
         this.context = context;
-        this.listaTipovaTransakcija = listaTipovaTransakcija;
+        this.listaTipovaTransakcija = new ArrayList<String>(Arrays.asList("Sort by", "Price - Ascending", "Price - Descending", "Title - Ascending", "Title - Descending", "Date - Ascending", "Date - Descending"));
+        //= listaTipovaTransakcija;
     }
 
     @Override

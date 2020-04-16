@@ -10,7 +10,7 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_margin="15dp"
+            android:layout_margin="10dp"
             android:background="#000000">
 
             <LinearLayout
@@ -116,7 +116,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="#64BEDC"
-                android:weightSum="3" app:layout_constraintEnd_toEndOf="parent"
+                android:weightSum="3"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/ll4" >
 
@@ -389,7 +390,7 @@
             <LinearLayout
                 android:id="@+id/ll14"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
+                android:layout_height="100dp"
                 android:background="#a5cfdd"
                 android:orientation="horizontal"
 
@@ -424,7 +425,7 @@
 
             <View
                 android:id="@+id/v18"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="10dp"
                 android:background="#a5cfdd"
                 app:layout_constraintEnd_toEndOf="parent"

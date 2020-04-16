@@ -12,7 +12,7 @@ import java.util.TimeZone;
 
 public class TransactionModel {
 
-    private static ArrayList<Transaction> transactions = new ArrayList<>(
+    public static ArrayList<Transaction> transactions = new ArrayList<>(
             Arrays.asList(new Transaction(getDate(2020,1,26),100, "Stipendija", Transaction.Type.REGULARINCOME, "Potrebno",30, getDate(2020,6,30)),
                     new Transaction(getDate(2019,1,27),-500, "Uplata za stanarinu", Transaction.Type.REGULARPAYMENT, "Prvo tromjesecje",90, getDate(2021,1,26)),
                     new Transaction(getDate(2020,3,17),200, "Takmicenje", Transaction.Type.INDIVIDUALINCOME, null,0, null),

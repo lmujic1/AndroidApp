@@ -1,5 +1,8 @@
 package ba.unsa.etf.rma.spirala.models;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import androidx.annotation.NonNull;
 
 import java.io.Serializable;
@@ -8,8 +11,40 @@ import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.Date;
 
-public class Transaction implements Serializable {
+public class Transaction implements Serializable, Parcelable {
 
+
+    protected Transaction(Parcel in) {
+        amount = in.readDouble();
+        title = in.readString();
+        itemDescription = in.readString();
+        transactionInterval = in.readInt();
+    }
+
+    public static final Creator<Transaction> CREATOR = new Creator<Transaction>() {
+        @Override
+        public Transaction createFromParcel(Parcel in) {
+            return new Transaction(in);
+        }
+
+        @Override
+        public Transaction[] newArray(int size) {
+            return new Transaction[size];
+        }
+    };
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeDouble(amount);
+        dest.writeString(title);
+        dest.writeString(itemDescription);
+        dest.writeInt(transactionInterval);
+    }
 
     public enum Type {
         INDIVIDUALPAYMENT("Individual payment"),
