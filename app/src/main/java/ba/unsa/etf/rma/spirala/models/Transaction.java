@@ -6,19 +6,23 @@ import android.os.Parcelable;
 import androidx.annotation.NonNull;
 
 import java.io.Serializable;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.Date;
 
-public class Transaction implements Serializable, Parcelable {
+public class Transaction implements Serializable {
 
 
-    protected Transaction(Parcel in) {
+/*    protected Transaction(Parcel in) {
         amount = in.readDouble();
         title = in.readString();
+        type = Type.valueOf(in.readString());
+        date = new Date(in.readLong());
         itemDescription = in.readString();
         transactionInterval = in.readInt();
+        endDate = new Date(in.readLong());
     }
 
     public static final Creator<Transaction> CREATOR = new Creator<Transaction>() {
@@ -42,16 +46,19 @@ public class Transaction implements Serializable, Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeDouble(amount);
         dest.writeString(title);
+        dest.writeString(type.toString());
+        dest.writeLong(date.getTime());
+        if(endDate != null) dest.writeLong(endDate.getTime());
         dest.writeString(itemDescription);
         dest.writeInt(transactionInterval);
-    }
+    }*/
 
     public enum Type {
-        INDIVIDUALPAYMENT("Individual payment"),
         REGULARPAYMENT("Regular payment"),
+        REGULARINCOME("Regular income"),
         PURCHASE("Purchase"),
         INDIVIDUALINCOME("Individual income"),
-        REGULARINCOME("Regular income");
+        INDIVIDUALPAYMENT("Individual payment");
 
         private final String opis;
 
@@ -66,18 +73,86 @@ public class Transaction implements Serializable, Parcelable {
         }
     }
 
+    private int idTransaction;
     private Date date;
     private double amount;
     private String title;
     private Type type;
     private String itemDescription;
-    private int transactionInterval;
+    private Integer transactionInterval;
     private Date endDate = null;
 
     public Transaction() {
     }
 
-    public Transaction(Date date, double amount, String title, Type type, String itemDescription, int transactionInterval, Date endDate) {
+    public Transaction(Date date, double amount, String title, int type, String itemDescription, Integer transactionInterval, Date endDate) {
+        this.date = date;
+        this.amount = amount;
+        setTitle(title);
+        switch (type) {
+            case 1:
+                this.type = Type.REGULARPAYMENT;
+                break;
+            case 2:
+                this.type = Type.REGULARINCOME;
+                break;
+            case 3:
+                this.type = Type.PURCHASE;
+                break;
+            case 4:
+                this.type = Type.INDIVIDUALINCOME;
+                break;
+            case 5:
+                this.type = Type.INDIVIDUALPAYMENT;
+                break;
+        }
+        setItemDescription(itemDescription);
+        setTransactionInterval(transactionInterval);
+        setEndDate(endDate);
+    }
+
+    public Transaction(int idTransaction, String date, double amount, String title, int type, String itemDescription, String transactionInterval, String endDate) {
+        this.idTransaction = idTransaction;
+        Date date1 = pretvoriUDatum(date);
+        Date endDate1 = pretvoriUDatum(endDate);
+        this.date = date1;
+
+        this.amount = amount;
+        setTitle(title);
+        switch (type) {
+            case 1:
+                this.type = Type.REGULARPAYMENT;
+                break;
+            case 2:
+                this.type = Type.REGULARINCOME;
+                break;
+            case 3:
+                this.type = Type.PURCHASE;
+                break;
+            case 4:
+                this.type = Type.INDIVIDUALINCOME;
+                break;
+            case 5:
+                this.type = Type.INDIVIDUALPAYMENT;
+                break;
+        }
+        setItemDescription(itemDescription);
+        setTransactionInterval(transactionInterval);
+        setEndDate(endDate1);
+    }
+
+    private Date pretvoriUDatum(String date) {
+        Date date1 = null;
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
+        try {
+            date1 = dateFormat.parse(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return date1;
+    }
+
+    public Transaction(Date date, double amount, String title, Type type, String itemDescription, Integer transactionInterval, Date endDate) {
         this.date = date;
         this.amount = amount;
         setTitle(title);
@@ -96,6 +171,7 @@ public class Transaction implements Serializable, Parcelable {
         String d = dateFormat.format(date);
         return d;
     }
+
     public void setDate(Date date) {
         this.date = date;
     }
@@ -113,8 +189,8 @@ public class Transaction implements Serializable, Parcelable {
     }
 
     public void setTitle(String title) {
-        if (title.length() <= 3 || title.length() >= 15)
-            System.out.println("G R E S K A");//throw new IllegalArgumentException();
+        //if (title.length() <= 3 || title.length() >= 15)
+        //    System.out.println("G R E S K A");//throw new IllegalArgumentException();
         this.title = title;
     }
 
@@ -125,6 +201,7 @@ public class Transaction implements Serializable, Parcelable {
     public void setType(Type type) {
         this.type = type;
     }
+
 
     public String getItemDescription() {
         return itemDescription;
@@ -137,14 +214,22 @@ public class Transaction implements Serializable, Parcelable {
             this.itemDescription = itemDescription;
     }
 
-    public int getTransactionInterval() {
+    public Integer getTransactionInterval() {
         return transactionInterval;
     }
 
-    public void setTransactionInterval(int transactionInterval) {
-        this.transactionInterval = 0;
+    public void setTransactionInterval(Integer transactionInterval) {
+        this.transactionInterval = null;
         if (type == Type.REGULARINCOME || type == Type.REGULARPAYMENT)
             this.transactionInterval = transactionInterval;
+    }
+
+    private void setTransactionInterval(String transactionInterval) {
+        //if (type == Type.REGULARINCOME || type == Type.REGULARPAYMENT)
+        if (transactionInterval != null)
+            this.transactionInterval = Integer.getInteger(transactionInterval);
+            //this.transactionInterval = Integer.parseInt(transactionInterval);
+        else this.transactionInterval = null;
     }
 
     public Date getEndDate() {

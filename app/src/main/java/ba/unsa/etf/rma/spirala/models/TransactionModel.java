@@ -35,7 +35,7 @@ public class TransactionModel {
                     new Transaction(getDate(2019,2,27),20, "Pohod", Transaction.Type.INDIVIDUALINCOME, null,0,null))
     );
 
-    private static Date getDate(int year, int month, int day) {
+    public static Date getDate(int year, int month, int day) {
         Calendar cal = new GregorianCalendar();
         cal.set(Calendar.YEAR, year);
         cal.set(Calendar.MONTH, month-1);

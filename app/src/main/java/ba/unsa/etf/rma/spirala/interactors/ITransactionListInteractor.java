@@ -8,4 +8,5 @@ import ba.unsa.etf.rma.spirala.models.Transaction;
 public interface ITransactionListInteractor {
     ArrayList<Transaction> get();
     ArrayList<Transaction> getOnMonth(Date date);
+    ArrayList<Transaction> getOnMonthAndDeleteTransactions(Date date, ArrayList<Transaction> transactions);
 }

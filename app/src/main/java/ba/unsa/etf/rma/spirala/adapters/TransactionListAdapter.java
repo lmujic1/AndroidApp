@@ -25,25 +25,12 @@ import ba.unsa.etf.rma.spirala.R;
 import ba.unsa.etf.rma.spirala.models.Transaction;
 
 public class TransactionListAdapter extends ArrayAdapter<Transaction> {
-    private Context context;
     int resource;
-    private ArrayList<Transaction> transakcije;
-    private static ArrayList<Transaction> pomocnalista;
 
     public TransactionListAdapter(@NonNull Context context, int resource, ArrayList<Transaction> transactions) {
-
         super(context, resource, transactions);
-        //this.context = context;
         this.resource = resource;
-        //this.transakcije = transactions;
-        //this.pomocnalista = transactions;
     }
-
-   /* @Override
-    public int getCount() {
-        return transakcije.size();
-    }
-*/
 
     public Transaction getTransaction(int position) {
         return this.getItem(position);
@@ -52,13 +39,6 @@ public class TransactionListAdapter extends ArrayAdapter<Transaction> {
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-/*
-        View view = convertView;
-        if (view == null) {
-            LayoutInflater li;
-            li = LayoutInflater.from(context);
-            view = li.inflate(R.layout.lista_transakcija, null);
-        }*/
 
         LinearLayout view;
         if(convertView == null) {
@@ -72,7 +52,6 @@ public class TransactionListAdapter extends ArrayAdapter<Transaction> {
         }
 
         Transaction transaction = getItem(position);
-       // if (transaction != null) {
             TextView nTransakcije = view.findViewById(R.id.titleTransaction);
             TextView iTransakcije = view.findViewById(R.id.iznosTransakcije);
             ImageView ikonaTransakcije = view.findViewById(R.id.ikonaTransakcije);
@@ -98,7 +77,6 @@ public class TransactionListAdapter extends ArrayAdapter<Transaction> {
                 default:
                     ikonaTransakcije.setImageResource(R.drawable.transaction);
             }
-        //}
 
         return view;
     }
@@ -158,14 +136,10 @@ public class TransactionListAdapter extends ArrayAdapter<Transaction> {
     }
 
 
-    public void izbrisiTransakciju(Transaction izabranaTransakcija) {
-        transakcije.remove(izabranaTransakcija);
-        notifyDataSetChanged();
-    }
-
     public void dodajTransakciju(Transaction nova) {
-        transakcije.add(nova);
-        notifyDataSetChanged();
+        this.add(nova);
+        //this.notifyDataSetChanged();
+        //notifyDataSetChanged();
     }
 
     public void setTransactions(ArrayList<Transaction> transactions) {
@@ -174,5 +148,10 @@ public class TransactionListAdapter extends ArrayAdapter<Transaction> {
 
     public void clearList() {
         this.clear();
+    }
+
+    public void delete(Transaction transaction) {
+        this.remove(transaction);
+        //notifyDataSetChanged();
     }
 }

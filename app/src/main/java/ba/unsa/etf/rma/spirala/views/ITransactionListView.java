@@ -1,4 +1,4 @@
-package ba.unsa.etf.rma.spirala.fragments;
+package ba.unsa.etf.rma.spirala.views;
 
 import java.util.ArrayList;
 
@@ -10,4 +10,8 @@ public interface ITransactionListView {
     void notifyTransactionListDataSetChanged();
     void clearListOfTransactions();
     void sort(String string);
+
+    void removeTransaction(Transaction transaction);
+
+    void addTransaction(Transaction trans);
 }

@@ -11,5 +11,6 @@
     <string name="save">Save</string>
     <string name="delete">Delete</string>
     <string name="title_of_transaction">Title of transaction</string>
-    <string name="amount">Amount x number of transaction</string>
+    <string name="api_id">7a4c053e-81fb-42ec-847b-b356864911dc</string>
+    <string name="amount" />
 </resources>

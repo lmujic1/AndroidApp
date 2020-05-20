@@ -21,9 +21,19 @@ public class SpinnerAdapter extends BaseAdapter {
 
     public SpinnerAdapter(Context context) {
         this.context = context;
-        this.listaTipovaTransakcija = new ArrayList<String>(Arrays.asList("Sort by", "Price - Ascending", "Price - Descending", "Title - Ascending", "Title - Descending", "Date - Ascending", "Date - Descending"));
+
         //= listaTipovaTransakcija;
     }
+
+    public void dodajFiltereZaSortiranje() {
+        this.listaTipovaTransakcija = new ArrayList<String>(Arrays.asList("Sort by", "Price - Ascending", "Price - Descending", "Title - Ascending", "Title - Descending", "Date - Ascending", "Date - Descending"));
+    }
+
+    public void dodajTipoveTransakcija() {
+        this.listaTipovaTransakcija = new ArrayList<>(Arrays.asList("Select type","Individual payment","Regular payment","Purchase","Individual income","Regular income"));
+    }
+
+
 
     @Override
     public int getCount() {
