@@ -141,6 +141,14 @@ public class Transaction implements Serializable {
         setEndDate(endDate1);
     }
 
+    public int getIdTransaction() {
+        return idTransaction;
+    }
+
+    public void setIdTransaction(int idTransaction) {
+        this.idTransaction = idTransaction;
+    }
+
     private Date pretvoriUDatum(String date) {
         Date date1 = null;
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");

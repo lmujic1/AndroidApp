@@ -42,7 +42,7 @@ public class PocetnaAktivnost extends AppCompatActivity implements ITransactionL
     private ListView lVTransakcije;
     private Button dodajTransakciju;
     private ITransactionListPresenter trasactionListPresenter;
-   // private IAccountPresenter accountPresenter;
+    // private IAccountPresenter accountPresenter;
     public static Date defaultDate = new Date();
     private static SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM, yyyy");
 
@@ -72,11 +72,11 @@ public class PocetnaAktivnost extends AppCompatActivity implements ITransactionL
 
     private OnItemClick onItemClick;
 
-   /* @Override
-    public void setAccount(Account account) {
-        this.account = account;
-    }
-*/
+    /* @Override
+     public void setAccount(Account account) {
+         this.account = account;
+     }
+ */
     public interface OnItemClick {
         public void onItemClicked(Transaction transaction);
     }
@@ -281,7 +281,8 @@ public class PocetnaAktivnost extends AppCompatActivity implements ITransactionL
 
         if (resultCode == 2) {
             if (data != null) {
-                transakcijeZaBrisati.add(izabranaTransakcija);
+                //transakcijeZaBrisati.add(izabranaTransakcija);
+                getPresenter().deleteTransaction(izabranaTransakcija);
                 // getPresenter().refreshTransactionDelete(izabranaTransakcija);
             }
         } else if (requestCode == 3) {
@@ -320,8 +321,8 @@ public class PocetnaAktivnost extends AppCompatActivity implements ITransactionL
                 nova.setDate(date);
                 nova.setEndDate(endDate);
 
-                transakcijeZaDodati.add(nova);
-                 getPresenter().addTransaction(nova);
+                //transakcijeZaDodati.add(nova);
+                getPresenter().addTransaction(nova);
             }
         }
     }

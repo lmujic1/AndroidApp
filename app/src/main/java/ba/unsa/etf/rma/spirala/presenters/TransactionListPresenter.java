@@ -7,13 +7,14 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
+import ba.unsa.etf.rma.spirala.interactors.DeleteTransactionInteractor;
 import ba.unsa.etf.rma.spirala.interactors.TransactionDetailInteractor;
 import ba.unsa.etf.rma.spirala.views.ITransactionListView;
 import ba.unsa.etf.rma.spirala.activities.PocetnaAktivnost;
 import ba.unsa.etf.rma.spirala.interactors.TransactionListInteractor;
 import ba.unsa.etf.rma.spirala.models.Transaction;
 
-public class TransactionListPresenter implements ITransactionListPresenter, TransactionListInteractor.OnTransactionGetDone, TransactionDetailInteractor.OnTransactionGetDone {
+public class TransactionListPresenter implements ITransactionListPresenter, TransactionListInteractor.OnTransactionGetDone, TransactionDetailInteractor.OnTransactionGetDone,DeleteTransactionInteractor.OnTransactionGetDone {
 
     private ITransactionListView view;
     private Context context;
@@ -119,7 +120,7 @@ public class TransactionListPresenter implements ITransactionListPresenter, Tran
         if (typeId == 1 || typeId == 2) {
             String endDate = dateFormat.format(nova.getEndDate());
             query += "," + "\n" + "\"endDate\" : " + "\"" + endDate + "\"" + "\n" +
-                    "\"transactionInterval\" : " + nova.getTransactionInterval() ;
+                    "\"transactionInterval\" : " + nova.getTransactionInterval();
         }
         if (typeId != 2 && typeId != 4) {
             query += "," + "\n" + "\"itemDescription\" : " + "\"" + nova.getItemDescription() + "\"" + "\n";
@@ -127,6 +128,12 @@ public class TransactionListPresenter implements ITransactionListPresenter, Tran
         query += "\n}";
         System.out.println(query);
         new TransactionDetailInteractor((TransactionDetailInteractor.OnTransactionGetDone) this, nova).execute(query);
+    }
+
+    @Override
+    public void deleteTransaction(Transaction izabranaTransakcija) {
+        String query = "/" + izabranaTransakcija.getIdTransaction();
+        new DeleteTransactionInteractor((DeleteTransactionInteractor.OnTransactionGetDone) this, izabranaTransakcija).execute(query);
     }
 
 
@@ -140,6 +147,11 @@ public class TransactionListPresenter implements ITransactionListPresenter, Tran
     @Override
     public void onAddDone(Transaction results) {
         // view.addTransaction(results);
+        view.notifyTransactionListDataSetChanged();
+    }
+
+    @Override
+    public void onDeleteDone(Transaction results) {
         view.notifyTransactionListDataSetChanged();
     }
 

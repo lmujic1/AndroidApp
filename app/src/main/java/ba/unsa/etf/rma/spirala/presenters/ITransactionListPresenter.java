@@ -13,6 +13,8 @@ public interface ITransactionListPresenter {
     void getFilteredTransacion(String selectedItemText);
 
     void addTransaction(Transaction nova);
+
+    void deleteTransaction(Transaction izabranaTransakcija);
     /*void refreshTransaction();
     void refreshTransactionOnDate(Date date);
     void refreshTransactionSort(String string);
