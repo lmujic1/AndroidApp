@@ -14,6 +14,7 @@ import android.widget.Spinner;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -23,6 +24,7 @@ import ba.unsa.etf.rma.spirala.models.Transaction;
 import ba.unsa.etf.rma.spirala.models.Transaction.Type;
 
 import static ba.unsa.etf.rma.spirala.models.Transaction.Type.INDIVIDUALINCOME;
+import static ba.unsa.etf.rma.spirala.models.Transaction.Type.REGULARPAYMENT;
 
 public class AddTransaction extends AppCompatActivity {
     private EditText title;
@@ -89,7 +91,7 @@ public class AddTransaction extends AppCompatActivity {
                     endDateTransaction.setEnabled(false);
                     break;
                 case "Regular payment":
-                    type = Type.REGULARPAYMENT;
+                    type = REGULARPAYMENT;
                     intervalOfTransaction.setEnabled(true);
                     descriptionTransaction.setEnabled(true);
                     endDateTransaction.setEnabled(true);
@@ -156,7 +158,7 @@ public class AddTransaction extends AppCompatActivity {
             y1 = endDateTransaction.getYear();
             Calendar calendar2 = Calendar.getInstance();
             calendar2.set(y1, m1, d1);
-            endDateTransaction1 = calendar2.getTime() ;
+            endDateTransaction1 = calendar2.getTime();
             //descripton
             descriptionOfTransaction = String.valueOf(descriptionTransaction.getText());
             //interval
@@ -167,7 +169,7 @@ public class AddTransaction extends AppCompatActivity {
                     endDateTransaction1 = null;
                     break;
                 case REGULARPAYMENT:
-                    descriptionOfTransaction = null;
+                   // descriptionOfTransaction = null;
                     intervalTransaction = Integer.parseInt(String.valueOf(intervalOfTransaction.getText()));
                     break;
                 case PURCHASE:
@@ -183,26 +185,53 @@ public class AddTransaction extends AppCompatActivity {
                     break;
                 case REGULARINCOME:
                     type = Type.REGULARINCOME;
+                    descriptionOfTransaction = null;
                     intervalTransaction = Integer.parseInt(String.valueOf(intervalOfTransaction.getText()));
                     break;
             }
 
-            //transaction = new Transaction(dateTransaction,amountTransaction,titleTransaction, type,descriptionOfTransaction,intervalTransaction,endDateTransaction1);
+            Transaction nova = new Transaction(dateTransaction, amountTransaction, titleTransaction, type, descriptionOfTransaction, intervalTransaction, endDateTransaction1);
+            //dodajTransakciju(nova);
             Intent i = new Intent();
-            Bundle b=new Bundle();
+            Bundle b = new Bundle();
             b.putString("title", titleTransaction);
-            b.putSerializable("type",type);
-            b.putString("itemDescription",descriptionOfTransaction);
+            b.putSerializable("type", type);
+            b.putString("itemDescription", descriptionOfTransaction);
             b.putDouble("amount", amountTransaction);
-            b.putSerializable("interval",intervalTransaction);
-            b.putSerializable("date",dateTransaction);
-            b.putSerializable("endDate",endDateTransaction1);
+            b.putSerializable("interval", intervalTransaction);
+            b.putSerializable("date", dateTransaction);
+            b.putSerializable("endDate", endDateTransaction1);
             //System.out.println("ime novododane transakcije" + transaction.getTitle()+" " + transaction.getDate());
             i.putExtras(b);
-            setResult(3,i);
+            setResult(3, i);
+
             finish();
         }
     };
+
+    private void dodajTransakciju(Transaction nova) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
+        String date = dateFormat.format(nova.getDate());
+        Type type = nova.getType();
+        int typeId = nova.getTypeId(type);
+        String query = "{\n" +
+                "\"title\" : " + "\"" + nova.getTitle() + "\"" + "\n" +
+                "\"date\" : " + "\"" + date + "\"" + "\n" +
+                "\"TransactionTypeId\" : " + typeId + "\n" +
+                "\"amount\" : " + nova.getAmount() + "\n";
+
+        if (typeId == 1 || typeId == 2) {
+            String endDate = dateFormat.format(nova.getEndDate());
+            query += "\"endDate\" : " + "\"" + endDate + "\"" + "\n" +
+                    "\"transactionInterval\" : " + nova.getTransactionInterval() + "\n";
+        }
+        if (typeId != 2 && typeId != 4) {
+            query += "\"itemDescription\" : " + "\"" + nova.getItemDescription() + "\"" + "\n";
+        }
+
+        query += "\n}";
+        System.out.println(query);
+    }
 
     private boolean validirajTitle(Editable text) {
         String s = String.valueOf(text);

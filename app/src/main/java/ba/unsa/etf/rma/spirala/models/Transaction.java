@@ -241,4 +241,29 @@ public class Transaction implements Serializable {
             this.endDate = endDate;
         else this.endDate = null;
     }
+
+    public int getTypeId(Type type) {
+        int TransactionTypeId;
+        switch (type) {
+            case REGULARPAYMENT:
+                TransactionTypeId = 1;
+                break;
+            case REGULARINCOME:
+                TransactionTypeId = 2;
+                break;
+            case PURCHASE:
+                TransactionTypeId = 3;
+                break;
+            case INDIVIDUALINCOME:
+                TransactionTypeId = 4;
+                break;
+            case INDIVIDUALPAYMENT:
+                TransactionTypeId = 5;
+                break;
+            default:
+                TransactionTypeId = 0;
+                break;
+        }
+        return TransactionTypeId;
+    }
 }

@@ -319,8 +319,9 @@ public class PocetnaAktivnost extends AppCompatActivity implements ITransactionL
                 nova.setAmount(amount);
                 nova.setDate(date);
                 nova.setEndDate(endDate);
+
                 transakcijeZaDodati.add(nova);
-                // getPresenter().refreshTransactionAdd(nova);
+                 getPresenter().addTransaction(nova);
             }
         }
     }

@@ -11,6 +11,8 @@ public interface ITransactionListPresenter {
     public void getSortTransaction(String string);
 
     void getFilteredTransacion(String selectedItemText);
+
+    void addTransaction(Transaction nova);
     /*void refreshTransaction();
     void refreshTransactionOnDate(Date date);
     void refreshTransactionSort(String string);

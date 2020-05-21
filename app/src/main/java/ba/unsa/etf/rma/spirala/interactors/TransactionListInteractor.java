@@ -67,7 +67,7 @@ public class TransactionListInteractor extends AsyncTask<String, Integer, Void> 
             int page = 0;
             while (pomResults.length() > 0) {
                 String url1 = url2 + "&page=" + page;
-                System.out.println(url1);
+                //System.out.println(url1);
                 URL url = new URL(url1);
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
                 InputStream in = new BufferedInputStream(urlConnection.getInputStream());
@@ -87,10 +87,8 @@ public class TransactionListInteractor extends AsyncTask<String, Integer, Void> 
                     String endDate = transaction.getString("endDate");
                     int transactionTypeId = transaction.getInt("TransactionTypeId");
 
-                    System.out.println("DEŠAVA LI SE IŠTA?" + transactionTypeId);
                     Transaction transaction1 = new Transaction(idTransaction, date, amount, tite, transactionTypeId, itemDescription, transactionInterval, endDate);
 
-                    //  if (idTransaction != 1 && idTransaction != 2)
                     transactions.add(transaction1);
                 }
                 pomResults = results;
@@ -121,7 +119,7 @@ public class TransactionListInteractor extends AsyncTask<String, Integer, Void> 
                 int page = 0;
                 while (pomResults.length() > 0) {
                     String url1 = url3 + "&page=" + page;
-                    System.out.println(url1);
+                    //System.out.println(url1);
                     URL url = new URL(url1);
                     HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
                     InputStream in = new BufferedInputStream(urlConnection.getInputStream());
@@ -141,7 +139,7 @@ public class TransactionListInteractor extends AsyncTask<String, Integer, Void> 
                         String endDate = transaction.getString("endDate");
                         int transactionTypeId = transaction.getInt("TransactionTypeId");
 
-                        System.out.println("DEŠAVA LI SE IŠTA?" + transactionTypeId);
+                       // System.out.println("DEŠAVA LI SE IŠTA?" + transactionTypeId);
                         Transaction transaction1 = new Transaction(idTransaction, date, amount, tite, transactionTypeId, itemDescription, transactionInterval, endDate);
                         regularTransactions.add(transaction1);
                     }
@@ -197,32 +195,6 @@ public class TransactionListInteractor extends AsyncTask<String, Integer, Void> 
         public void onGetDone(ArrayList<Transaction> results);
     }
 
-
-
-
-    /*public ArrayList<Transaction> get() {
-        return TransactionModel.transactions;
-    }*/
-
-   /* public ArrayList<Transaction> getOnMonth(Date date) {
-        ArrayList<Transaction> trans = new ArrayList<>();
-        ArrayList<Transaction> transactions = new ArrayList<>();
-        trans.addAll(TransactionModel.transactions);
-        trans.removeAll(PocetnaAktivnost.transakcijeZaBrisati);
-        trans.addAll(PocetnaAktivnost.transakcijeZaDodati);
-        Calendar cal = new GregorianCalendar();
-        cal.setTime(date);
-        long mjesec = cal.get(Calendar.MONTH) + 1, godina = cal.get(Calendar.YEAR);
-        for (Transaction t : trans) {
-            Calendar c1 = new GregorianCalendar();
-            c1.setTime(t.getDate());
-            int tmj = c1.get(Calendar.MONTH) + 1, tgod = c1.get(Calendar.YEAR);
-            if (tmj == mjesec && tgod == godina)
-                transactions.add(t);
-        }
-
-        return transactions;
-    }*/
 
    /* @Override
     public ArrayList<Transaction> getOnMonthAndDeleteTransactions(Date date, ArrayList<Transaction> transactions) {

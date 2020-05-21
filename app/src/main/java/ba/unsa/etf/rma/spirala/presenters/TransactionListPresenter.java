@@ -3,15 +3,17 @@ package ba.unsa.etf.rma.spirala.presenters;
 import android.content.Context;
 import android.text.format.DateFormat;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
+import ba.unsa.etf.rma.spirala.interactors.TransactionDetailInteractor;
 import ba.unsa.etf.rma.spirala.views.ITransactionListView;
 import ba.unsa.etf.rma.spirala.activities.PocetnaAktivnost;
 import ba.unsa.etf.rma.spirala.interactors.TransactionListInteractor;
 import ba.unsa.etf.rma.spirala.models.Transaction;
 
-public class TransactionListPresenter implements ITransactionListPresenter, TransactionListInteractor.OnTransactionGetDone {
+public class TransactionListPresenter implements ITransactionListPresenter, TransactionListInteractor.OnTransactionGetDone, TransactionDetailInteractor.OnTransactionGetDone {
 
     private ITransactionListView view;
     private Context context;
@@ -30,7 +32,6 @@ public class TransactionListPresenter implements ITransactionListPresenter, Tran
     @Override
     public void getTransactionOnDate(Date date) {
         String monthString = (String) DateFormat.format("MM", date);
-        System.out.println(monthString + "TREBA MI OVAJ MJESEC ");
         String yearString = (String) DateFormat.format("yyyy", date);
         String query = "/filter?month=" + monthString + "&year=" + yearString;
         new TransactionListInteractor((TransactionListInteractor.OnTransactionGetDone) this).execute(query);
@@ -104,9 +105,41 @@ public class TransactionListPresenter implements ITransactionListPresenter, Tran
 
 
     @Override
+    public void addTransaction(Transaction nova) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        String date = dateFormat.format(nova.getDate());
+        Transaction.Type type = nova.getType();
+        int typeId = nova.getTypeId(type);
+        String query = "{\n" +
+                "\"title\" : " + "\"" + nova.getTitle() + "\"" + "," + "\n" +
+                "\"date\" : " + "\"" + date + "\"" + "," + "\n" +
+                "\"typeId\" : " + typeId + "," + "\n" +
+                "\"amount\" : " + nova.getAmount();
+
+        if (typeId == 1 || typeId == 2) {
+            String endDate = dateFormat.format(nova.getEndDate());
+            query += "," + "\n" + "\"endDate\" : " + "\"" + endDate + "\"" + "\n" +
+                    "\"transactionInterval\" : " + nova.getTransactionInterval() ;
+        }
+        if (typeId != 2 && typeId != 4) {
+            query += "," + "\n" + "\"itemDescription\" : " + "\"" + nova.getItemDescription() + "\"" + "\n";
+        }
+        query += "\n}";
+        System.out.println(query);
+        new TransactionDetailInteractor((TransactionDetailInteractor.OnTransactionGetDone) this, nova).execute(query);
+    }
+
+
+    @Override
     public void onGetDone(ArrayList<Transaction> results) {
         view.clearListOfTransactions();
         view.setTransactions(results);
+        view.notifyTransactionListDataSetChanged();
+    }
+
+    @Override
+    public void onAddDone(Transaction results) {
+        // view.addTransaction(results);
         view.notifyTransactionListDataSetChanged();
     }
 
