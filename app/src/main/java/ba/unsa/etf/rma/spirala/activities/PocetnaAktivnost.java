@@ -27,6 +27,7 @@ import ba.unsa.etf.rma.spirala.adapters.FiltrirajAdapter;
 import ba.unsa.etf.rma.spirala.adapters.SpinnerAdapter;
 import ba.unsa.etf.rma.spirala.adapters.TransactionListAdapter;
 import ba.unsa.etf.rma.spirala.interactors.AccountInteractor;
+import ba.unsa.etf.rma.spirala.interactors.UpdateAccountInteractor;
 import ba.unsa.etf.rma.spirala.views.ITransactionListView;
 import ba.unsa.etf.rma.spirala.models.Account;
 import ba.unsa.etf.rma.spirala.models.Transaction;
@@ -285,6 +286,8 @@ public class PocetnaAktivnost extends AppCompatActivity implements ITransactionL
             if (data != null) {
                 getPresenter().deleteTransaction(izabranaTransakcija);
                 getPresenter().getTransactionOnDate(defaultDate);
+                editAccount(izabranaTransakcija, 2);
+                getInfoAboutAccount();
             }
         } else if (requestCode == 3) {
             if (data != null
@@ -324,6 +327,8 @@ public class PocetnaAktivnost extends AppCompatActivity implements ITransactionL
 
                 getPresenter().addTransaction(nova);
                 getPresenter().getTransactionOnDate(defaultDate);
+                editAccount(nova, 3);
+                getInfoAboutAccount();
             }
         } else if (resultCode == 4) {
             if (data != null
@@ -363,8 +368,48 @@ public class PocetnaAktivnost extends AppCompatActivity implements ITransactionL
 
                 getPresenter().editTransaction(nova, izabranaTransakcija);
                 getPresenter().getTransactionOnDate(defaultDate);
+                editAccount(nova, izabranaTransakcija, 3);
+                getInfoAboutAccount();
             }
         }
+    }
+
+    private void editAccount(Transaction nova, Transaction izabranaTransakcija, int vrsta) {
+        String query = "{\n";
+        Transaction.Type tip = nova.getType();
+        int type = nova.getTypeId(tip);
+        double newBudget = account.getBudget();
+        double oldBudget = izabranaTransakcija.getAmount();
+        if (vrsta == 3) {
+            if (type == 2 || type == 4) {
+                newBudget -= oldBudget;
+                newBudget += nova.getAmount();
+            } else {
+                newBudget += oldBudget;
+                newBudget -= nova.getAmount();
+            }
+        }
+        query += "\"budget\" : " + newBudget + "\n}";
+        new UpdateAccountInteractor().execute(query);
+    }
+
+    private void editAccount(Transaction nova, int vrsta) {
+
+        String query = "{\n";
+        Transaction.Type tip = nova.getType();
+        int type = nova.getTypeId(tip);
+        double newBudget = account.getBudget();
+        if (vrsta == 3) {
+            if (type == 2 || type == 4) {
+                newBudget += nova.getAmount();
+            } else newBudget -= nova.getAmount();
+        } else if (vrsta == 2) {
+            if (type == 2 || type == 4) {
+                newBudget -= nova.getAmount();
+            } else newBudget += nova.getAmount();
+        }
+        query += "\"budget\" : " + newBudget + "\n}";
+        new UpdateAccountInteractor().execute(query);
     }
 
 

@@ -185,15 +185,22 @@ public class AddTransaction extends AppCompatActivity {
     private View.OnClickListener onSaveButtonClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            boolean correctTtitle = true;
+            boolean correctTtitle = true, correctAmmount = true;
 
             titleTransaction = String.valueOf(title.getText());
             if (!validirajTitle(title.getText())) {
                 title.setBackgroundColor(Color.RED);
                 correctTtitle = false;
             } else title.setBackgroundColor(Color.GREEN);
+            String am = String.valueOf(amountEdit.getText());
+            if (am.equals("")) {
+                System.out.println("DA LI JE OVDJE");
+                amountEdit.setBackgroundColor(Color.RED);
+                correctAmmount = false;
+            } else if (!am.equals("")) {
+                amountTransaction = Double.valueOf(String.valueOf(amountEdit.getText()));
+            }
 
-            amountTransaction = Double.parseDouble(String.valueOf(amountEdit.getText()));
             //date
             int day, month, year;
             day = choseDate.getDayOfMonth();
@@ -269,8 +276,11 @@ public class AddTransaction extends AppCompatActivity {
                     if (d1 != eday || m1 != emonth || y1 != eyear)
                         endDateTransaction.setBackgroundColor(Color.GREEN);
                 }
-                if (amountTransaction != editTransaction.getAmount())
-                    amountEdit.setBackgroundColor(Color.GREEN);
+                if (correctAmmount) {
+                    if (amountTransaction != editTransaction.getAmount()) {
+                        amountEdit.setBackgroundColor(Color.GREEN);
+                    }
+                } else amountEdit.setBackgroundColor(Color.RED);
                 if (descriptionOfTransaction != null && !descriptionOfTransaction.equals(editTransaction.getItemDescription()))
                     descriptionTransaction.setBackgroundColor(Color.GREEN);
                 if (intervalTransaction != null && intervalTransaction != editTransaction.getTransactionInterval())
@@ -286,10 +296,10 @@ public class AddTransaction extends AppCompatActivity {
             b.putSerializable("date", dateTransaction);
             b.putSerializable("endDate", endDateTransaction1);
             i.putExtras(b);
-            if (!edit && correctTtitle) {
+            if (!edit && correctTtitle && correctAmmount) {
                 setResult(3, i);
                 finish();
-            } else if (edit && correctTtitle) {
+            } else if (edit && correctTtitle && correctAmmount) {
                 setResult(4, i);
                 finish();
             }
@@ -308,7 +318,7 @@ public class AddTransaction extends AppCompatActivity {
                     switch (which) {
                         case DialogInterface.BUTTON_POSITIVE:
                             Intent intent = new Intent();
-                            setResult(2,intent);
+                            setResult(2, intent);
                             finish();
                             break;
                         case DialogInterface.BUTTON_NEGATIVE:
