@@ -7,6 +7,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
+import ba.unsa.etf.rma.spirala.interactors.AccountInteractor;
 import ba.unsa.etf.rma.spirala.interactors.TransactionDeleteInteractor;
 import ba.unsa.etf.rma.spirala.interactors.TransactionAddInteractor;
 import ba.unsa.etf.rma.spirala.interactors.TransactionEditInteractor;
@@ -195,6 +196,8 @@ public class TransactionListPresenter implements ITransactionListPresenter, Tran
             new TransactionEditInteractor(izabranaTransakcija).execute(query);
         }
     }
+
+
 
 
     @Override

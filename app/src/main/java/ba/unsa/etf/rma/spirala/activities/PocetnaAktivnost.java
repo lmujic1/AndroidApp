@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -25,15 +26,16 @@ import ba.unsa.etf.rma.spirala.R;
 import ba.unsa.etf.rma.spirala.adapters.FiltrirajAdapter;
 import ba.unsa.etf.rma.spirala.adapters.SpinnerAdapter;
 import ba.unsa.etf.rma.spirala.adapters.TransactionListAdapter;
+import ba.unsa.etf.rma.spirala.interactors.AccountInteractor;
 import ba.unsa.etf.rma.spirala.views.ITransactionListView;
 import ba.unsa.etf.rma.spirala.models.Account;
 import ba.unsa.etf.rma.spirala.models.Transaction;
 import ba.unsa.etf.rma.spirala.presenters.ITransactionListPresenter;
 import ba.unsa.etf.rma.spirala.presenters.TransactionListPresenter;
 
-public class PocetnaAktivnost extends AppCompatActivity implements ITransactionListView/*extends Fragment implements ITransactionListView */ {
-    private TextView tVAmount;
-    private TextView tVLimit;
+public class PocetnaAktivnost extends AppCompatActivity implements ITransactionListView {
+    public static TextView tVAmount;
+    public static TextView tVLimit;
     private Spinner spinnerFilter;
     private ImageButton prevMonth;
     private TextView tDefaultDate;
@@ -42,16 +44,10 @@ public class PocetnaAktivnost extends AppCompatActivity implements ITransactionL
     private ListView lVTransakcije;
     private Button dodajTransakciju;
     private ITransactionListPresenter trasactionListPresenter;
-    // private IAccountPresenter accountPresenter;
     public static Date defaultDate = new Date();
     private static SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM, yyyy");
+    public static Handler handler = new Handler();
 
-   /* private IAccountPresenter  getAccount() {
-        if(accountPresenter == null) {
-            accountPresenter=new AccountPresenter(this);
-        }
-        return accountPresenter;
-    }*/
 
     public ITransactionListPresenter getPresenter() {
         if (trasactionListPresenter == null) {
@@ -64,29 +60,25 @@ public class PocetnaAktivnost extends AppCompatActivity implements ITransactionL
     private FiltrirajAdapter filtrirajAdapter;
     private SpinnerAdapter sortirajAdapter;
     private ArrayList<Transaction> listaTransakcija = new ArrayList<>();
-    public static ArrayList<Transaction> transakcijeZaBrisati = new ArrayList<>(), transakcijeZaDodati = new ArrayList<>();
 
     private Transaction izabranaTransakcija;
 
-    public static Account account = new Account();
+    public static Account account;
 
     private OnItemClick onItemClick;
 
-    /* @Override
-     public void setAccount(Account account) {
-         this.account = account;
-     }
- */
+
     public interface OnItemClick {
         public void onItemClicked(Transaction transaction);
     }
-
 
     @SuppressLint("SetTextI18n")
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.pocetna);
+
+
         transactionListAdapter = new TransactionListAdapter(this, R.layout.lista_transakcija, listaTransakcija);
         filtrirajAdapter = new FiltrirajAdapter(this);
         sortirajAdapter = new SpinnerAdapter(this);
@@ -102,10 +94,6 @@ public class PocetnaAktivnost extends AppCompatActivity implements ITransactionL
         lVTransakcije = (ListView) findViewById(R.id.lVTransakcije);
         dodajTransakciju = (Button) findViewById(R.id.bDodajTransakciju);
 
-        //getAccount().getInfoAboutAccount();
-
-        tVAmount.setText("Budget: " + String.valueOf(account.getBudget()));
-        tVLimit.setText("Month limit: " + String.valueOf(account.getMonthLimit()));
 
         tDefaultDate.setText(dateFormat.format(defaultDate));
 
@@ -125,6 +113,11 @@ public class PocetnaAktivnost extends AppCompatActivity implements ITransactionL
 
         dodajTransakciju.setOnClickListener(addTransactionOnClickListener);
 
+        getInfoAboutAccount();
+    }
+
+    private void getInfoAboutAccount() {
+        new AccountInteractor().execute();
     }
 
 
@@ -368,7 +361,7 @@ public class PocetnaAktivnost extends AppCompatActivity implements ITransactionL
                 nova.setDate(date);
                 nova.setEndDate(endDate);
 
-                getPresenter().editTransaction(nova,izabranaTransakcija);
+                getPresenter().editTransaction(nova, izabranaTransakcija);
                 getPresenter().getTransactionOnDate(defaultDate);
             }
         }

@@ -67,7 +67,7 @@ public class TransactionListInteractor extends AsyncTask<String, Integer, Void> 
             int page = 0;
             while (pomResults.length() >= 0) {
                 String url1 = url2 + "&page=" + page;
-                System.out.println(url1);
+                //System.out.println(url1);
                 URL url = new URL(url1);
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
                 InputStream in = new BufferedInputStream(urlConnection.getInputStream());
@@ -126,7 +126,7 @@ public class TransactionListInteractor extends AsyncTask<String, Integer, Void> 
                     String result = convertStreamToString(in);
                     JSONObject jsonObject = new JSONObject(result);
                     JSONArray results = jsonObject.getJSONArray("transactions");
-                   // if (results.length() == 0) break;
+                    // if (results.length() == 0) break;
                     for (int i = 0; i < results.length(); i++) {
                         JSONObject transaction = results.getJSONObject(i);
                         //datum

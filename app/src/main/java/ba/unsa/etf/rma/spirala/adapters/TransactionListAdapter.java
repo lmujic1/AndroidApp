@@ -41,42 +41,42 @@ public class TransactionListAdapter extends ArrayAdapter<Transaction> {
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
 
         LinearLayout view;
-        if(convertView == null) {
+        if (convertView == null) {
             view = new LinearLayout(getContext());
             String inflater = Context.LAYOUT_INFLATER_SERVICE;
             LayoutInflater li;
             li = (LayoutInflater) getContext().getSystemService(inflater);
-            li.inflate(resource,view,true);
+            li.inflate(resource, view, true);
         } else {
             view = (LinearLayout) convertView;
         }
 
         Transaction transaction = getItem(position);
-            TextView nTransakcije = view.findViewById(R.id.titleTransaction);
-            TextView iTransakcije = view.findViewById(R.id.iznosTransakcije);
-            ImageView ikonaTransakcije = view.findViewById(R.id.ikonaTransakcije);
-            nTransakcije.setText(transaction.getTitle());
-            iTransakcije.setText(String.format("%.2f", transaction.getAmount()));
-            String tipTransakcije = transaction.getType().toString();
-            switch (tipTransakcije) {
-                case "Individual payment":
-                    ikonaTransakcije.setImageResource(R.drawable.individual_payment);
-                    break;
-                case "Regular payment":
-                    ikonaTransakcije.setImageResource(R.drawable.regular_payment);
-                    break;
-                case "Purchase":
-                    ikonaTransakcije.setImageResource(R.drawable.purchase);
-                    break;
-                case "Individual income":
-                    ikonaTransakcije.setImageResource(R.drawable.individual_income);
-                    break;
-                case "Regular income":
-                    ikonaTransakcije.setImageResource(R.drawable.regular_income);
-                    break;
-                default:
-                    ikonaTransakcije.setImageResource(R.drawable.transaction);
-            }
+        TextView nTransakcije = view.findViewById(R.id.titleTransaction);
+        TextView iTransakcije = view.findViewById(R.id.iznosTransakcije);
+        ImageView ikonaTransakcije = view.findViewById(R.id.ikonaTransakcije);
+        nTransakcije.setText(transaction.getTitle());
+        iTransakcije.setText(String.format("%.2f", transaction.getAmount()));
+        String tipTransakcije = transaction.getType().toString();
+        switch (tipTransakcije) {
+            case "Individual payment":
+                ikonaTransakcije.setImageResource(R.drawable.individual_payment);
+                break;
+            case "Regular payment":
+                ikonaTransakcije.setImageResource(R.drawable.regular_payment);
+                break;
+            case "Purchase":
+                ikonaTransakcije.setImageResource(R.drawable.purchase);
+                break;
+            case "Individual income":
+                ikonaTransakcije.setImageResource(R.drawable.individual_income);
+                break;
+            case "Regular income":
+                ikonaTransakcije.setImageResource(R.drawable.regular_income);
+                break;
+            default:
+                ikonaTransakcije.setImageResource(R.drawable.transaction);
+        }
 
         return view;
     }
@@ -109,7 +109,7 @@ public class TransactionListAdapter extends ArrayAdapter<Transaction> {
                 });
                 break;
             case "Price - Descending":
-                this.sort( new Comparator<Transaction>() {
+                this.sort(new Comparator<Transaction>() {
                     @Override
                     public int compare(Transaction a, Transaction b) {
                         return -Double.compare(a.getAmount(), b.getAmount());
@@ -117,7 +117,7 @@ public class TransactionListAdapter extends ArrayAdapter<Transaction> {
                 });
                 break;
             case "Date - Ascending":
-                this.sort( new Comparator<Transaction>() {
+                this.sort(new Comparator<Transaction>() {
                     @Override
                     public int compare(Transaction a, Transaction b) {
                         return a.getDate().compareTo(b.getDate());
@@ -138,8 +138,6 @@ public class TransactionListAdapter extends ArrayAdapter<Transaction> {
 
     public void dodajTransakciju(Transaction nova) {
         this.add(nova);
-        //this.notifyDataSetChanged();
-        //notifyDataSetChanged();
     }
 
     public void setTransactions(ArrayList<Transaction> transactions) {
@@ -152,6 +150,5 @@ public class TransactionListAdapter extends ArrayAdapter<Transaction> {
 
     public void delete(Transaction transaction) {
         this.remove(transaction);
-        //notifyDataSetChanged();
     }
 }
