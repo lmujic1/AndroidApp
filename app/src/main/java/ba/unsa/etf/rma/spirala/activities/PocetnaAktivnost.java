@@ -116,6 +116,7 @@ public class PocetnaAktivnost extends AppCompatActivity implements ITransactionL
 
         lVTransakcije.setAdapter(transactionListAdapter);
         lVTransakcije.setOnItemClickListener(listaTransakcijaCLickListener);
+        lVTransakcije.setOnItemLongClickListener(editTransactionClickListener);
 
         //getPresenter().refreshTransactionOnDate(defaultDate);
 
@@ -147,6 +148,22 @@ public class PocetnaAktivnost extends AppCompatActivity implements ITransactionL
                     showTheTransaction(transaction);
                 }
             };
+
+    private AdapterView.OnItemLongClickListener editTransactionClickListener = new AdapterView.OnItemLongClickListener() {
+        @Override
+        public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+            Transaction transaction = transactionListAdapter.getTransaction(position);
+            izabranaTransakcija = transactionListAdapter.getTransaction(position);
+            editTransaction(transaction);
+            return true;
+        }
+    };
+
+    private void editTransaction(Transaction transaction) {
+        Intent transactionDetailIntent = new Intent(PocetnaAktivnost.this, AddTransaction.class);
+        transactionDetailIntent.putExtra("transaction", transaction);
+        startActivityForResult(transactionDetailIntent, 20);
+    }
 
     private void showTheTransaction(Transaction transaction) {
         Intent transactionDetailIntent = new Intent(PocetnaAktivnost.this, TransactionDetail.class);
@@ -281,9 +298,7 @@ public class PocetnaAktivnost extends AppCompatActivity implements ITransactionL
 
         if (resultCode == 2) {
             if (data != null) {
-                //transakcijeZaBrisati.add(izabranaTransakcija);
                 getPresenter().deleteTransaction(izabranaTransakcija);
-                // getPresenter().refreshTransactionDelete(izabranaTransakcija);
             }
         } else if (requestCode == 3) {
             if (data != null
@@ -321,8 +336,47 @@ public class PocetnaAktivnost extends AppCompatActivity implements ITransactionL
                 nova.setDate(date);
                 nova.setEndDate(endDate);
 
-                //transakcijeZaDodati.add(nova);
                 getPresenter().addTransaction(nova);
+                getPresenter().getTransactionOnDate(defaultDate);
+            }
+        } else if (resultCode == 4) {
+            if (data != null
+                    && data.getExtras().containsKey("title")
+                    && data.getExtras().containsKey("type")
+                    && data.getExtras().containsKey("itemDescription")
+                    && data.getExtras().containsKey("date")
+                    && data.getExtras().containsKey("interval")
+                    && data.getExtras().containsKey("endDate")
+                    && data.getExtras().containsKey("amount")) {
+
+                String title;
+                Transaction.Type type;
+                String description;
+                Date date;
+                Date endDate;
+                Integer interval;
+                double amount;
+                Transaction nova = new Transaction();
+
+
+                title = data.getStringExtra("title");
+                description = data.getStringExtra("itemDescription");
+                date = (Date) data.getSerializableExtra("date");
+                interval = (Integer) data.getSerializableExtra("interval");
+                endDate = (Date) data.getSerializableExtra("endDate");
+                amount = data.getDoubleExtra("amount", 0);
+                type = (Transaction.Type) data.getSerializableExtra("type");
+
+                nova.setType(type);
+                nova.setTitle(title);
+                nova.setItemDescription(description);
+                nova.setTransactionInterval(interval);
+                nova.setAmount(amount);
+                nova.setDate(date);
+                nova.setEndDate(endDate);
+
+                getPresenter().editTransaction(nova,izabranaTransakcija);
+                getPresenter().getTransactionOnDate(defaultDate);
             }
         }
     }

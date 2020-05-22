@@ -7,43 +7,43 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 
-import ba.unsa.etf.rma.spirala.activities.PocetnaAktivnost;
 import ba.unsa.etf.rma.spirala.models.Transaction;
 
-public class DeleteTransactionInteractor extends AsyncTask<String, Integer, Void> {
+public class TransactionEditInteractor extends AsyncTask<String, Integer, Void> {
     private String mainURL = "http://rma20-app-rmaws.apps.us-west-1.starter.openshift-online.com/account/";
     private String api_id = "7a4c053e-81fb-42ec-847b-b356864911dc";
     private Transaction transaction;
-    private OnTransactionGetDone caller;
+    //private TransactionAddInteractor.OnTransactionGetDone caller;
 
 
-    public DeleteTransactionInteractor(OnTransactionGetDone p, Transaction transaction) {
+    public TransactionEditInteractor(Transaction transaction) {
         this.transaction = transaction;
-        caller = p;
+        //  caller = p;
     }
 
     @Override
     protected Void doInBackground(String... strings) {
-        String forDelete = strings[0];
-        String url1 = mainURL + api_id + "/transactions"+ forDelete;
-        String forAdd = "";
+        Transaction.Type type = transaction.getType();
+        int tip = transaction.getTypeId(type);
+        String url1 = mainURL + api_id + "/transactions" + "/" + transaction.getIdTransaction();
+        System.out.println("OVO TREBAM: " + url1);
+        String forEdit = strings[0];
         try {
             URL url = new URL(url1);
             HttpURLConnection postConnection = (HttpURLConnection) url.openConnection();
             postConnection.setDoInput(true);
-            postConnection.setRequestMethod("DELETE");
+            postConnection.setRequestMethod("POST");
             postConnection.setRequestProperty("Content-Type", "application/json");
             postConnection.setRequestProperty("Accept", "application/json");
             postConnection.setDoOutput(true);
 
             try (OutputStream os = postConnection.getOutputStream()) {
-                byte[] input = forAdd.getBytes("utf-8");
+                byte[] input = forEdit.getBytes("utf-8");
                 os.write(input, 0, input.length);
             }
 
@@ -75,11 +75,11 @@ public class DeleteTransactionInteractor extends AsyncTask<String, Integer, Void
     @Override
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
-        PocetnaAktivnost.transactionListAdapter.delete(transaction);
+        //PocetnaAktivnost.transactionListAdapter.dodajTransakciju(transaction);
         //caller.onAddDone(transaction);
     }
 
     public interface OnTransactionGetDone {
-        public void onDeleteDone(Transaction results);
+        public void onAddDone(Transaction results);
     }
 }

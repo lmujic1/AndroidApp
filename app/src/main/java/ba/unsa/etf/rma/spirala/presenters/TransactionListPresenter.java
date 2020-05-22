@@ -7,14 +7,15 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
-import ba.unsa.etf.rma.spirala.interactors.DeleteTransactionInteractor;
-import ba.unsa.etf.rma.spirala.interactors.TransactionDetailInteractor;
+import ba.unsa.etf.rma.spirala.interactors.TransactionDeleteInteractor;
+import ba.unsa.etf.rma.spirala.interactors.TransactionAddInteractor;
+import ba.unsa.etf.rma.spirala.interactors.TransactionEditInteractor;
 import ba.unsa.etf.rma.spirala.views.ITransactionListView;
 import ba.unsa.etf.rma.spirala.activities.PocetnaAktivnost;
 import ba.unsa.etf.rma.spirala.interactors.TransactionListInteractor;
 import ba.unsa.etf.rma.spirala.models.Transaction;
 
-public class TransactionListPresenter implements ITransactionListPresenter, TransactionListInteractor.OnTransactionGetDone, TransactionDetailInteractor.OnTransactionGetDone,DeleteTransactionInteractor.OnTransactionGetDone {
+public class TransactionListPresenter implements ITransactionListPresenter, TransactionListInteractor.OnTransactionGetDone, TransactionAddInteractor.OnTransactionGetDone, TransactionDeleteInteractor.OnTransactionGetDone {
 
     private ITransactionListView view;
     private Context context;
@@ -127,13 +128,72 @@ public class TransactionListPresenter implements ITransactionListPresenter, Tran
         }
         query += "\n}";
         System.out.println(query);
-        new TransactionDetailInteractor((TransactionDetailInteractor.OnTransactionGetDone) this, nova).execute(query);
+        new TransactionAddInteractor((TransactionAddInteractor.OnTransactionGetDone) this, nova).execute(query);
     }
 
     @Override
     public void deleteTransaction(Transaction izabranaTransakcija) {
         String query = "/" + izabranaTransakcija.getIdTransaction();
-        new DeleteTransactionInteractor((DeleteTransactionInteractor.OnTransactionGetDone) this, izabranaTransakcija).execute(query);
+        new TransactionDeleteInteractor((TransactionDeleteInteractor.OnTransactionGetDone) this, izabranaTransakcija).execute(query);
+    }
+
+    @Override
+    public void editTransaction(Transaction nova, Transaction izabranaTransakcija) {
+        String query = "{\n";
+        if (!nova.getTitle().equals(izabranaTransakcija.getTitle())) {
+            query += "\"title\" : " + "\"" + nova.getTitle() + "\"";
+        }
+        if (nova.getDate() != izabranaTransakcija.getDate()) {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+            String date = dateFormat.format(nova.getDate());
+            String dat = "\"date\" : " + "\"" + date + "\"";
+            if (query != "{\n") query += "," + "\n" + dat;
+            else query += dat;
+        }
+        if (nova.getAmount() != izabranaTransakcija.getAmount()) {
+            double v = nova.getAmount();
+            String amount = "\"amount\" : " + v;
+            if (query != "{\n") query += "," + "\n" + amount;
+            else query += amount;
+        }
+        Integer interval = nova.getTransactionInterval();
+        Integer interval2 = izabranaTransakcija.getTransactionInterval();
+        if (interval != null && interval != interval2) {
+            String interv = "\"transactionInterval\" : " + interval;
+            if (query != "{\n") query += "," + "\n" + interv;
+            else query += interv;
+        }
+        if (nova.getItemDescription() != null) {
+            if (!nova.getItemDescription().equals(izabranaTransakcija.getItemDescription())) {
+                String descrip = nova.getItemDescription();
+                if (descrip != null) {
+                    String description = "\"itemDescription\" : " + "\"" + descrip + "\"";
+                    if (query != "{\n") query += "," + "\n" + description;
+                    else query += description;
+                }
+            }
+        }
+        if (nova.getEndDate() != null) {
+            if (nova.getDate() != izabranaTransakcija.getDate()) {
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+                String date = dateFormat.format(nova.getEndDate());
+                String dat = "\"endDate\" : " + "\"" + date + "\"";
+                if (query != "{\n") query += "," + "\n" + dat;
+                else query += dat;
+            }
+        }
+        if (nova.getType() != izabranaTransakcija.getType()) {
+            Transaction.Type tip = nova.getType();
+            int type = nova.getTypeId(tip);
+            String typeS = "\"TransactionTypeId\" : " + type;
+            if (query != "{\n") query += "," + "\n" + typeS;
+            else query += typeS;
+        }
+        query += "\n}";
+        System.out.println(query);
+        if (query != "{\n\n}") {
+            new TransactionEditInteractor(izabranaTransakcija).execute(query);
+        }
     }
 
 

@@ -30,7 +30,7 @@ public class SpinnerAdapter extends BaseAdapter {
     }
 
     public void dodajTipoveTransakcija() {
-        this.listaTipovaTransakcija = new ArrayList<>(Arrays.asList("Select type","Individual payment","Regular payment","Purchase","Individual income","Regular income"));
+        this.listaTipovaTransakcija = new ArrayList<>(Arrays.asList("Select type","Regular payment","Regular income","Purchase","Individual income","Individual payment"));
     }
 
 

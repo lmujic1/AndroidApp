@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.format.DateFormat;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -49,6 +50,8 @@ public class AddTransaction extends AppCompatActivity {
     private Integer intervalTransaction;
     private Transaction.Type type;
 
+    private boolean edit = false;
+    private Transaction editTransaction;
     //public static Transaction transaction;
 
     @Override
@@ -76,7 +79,51 @@ public class AddTransaction extends AppCompatActivity {
         titleTransaction = String.valueOf(title.getText());
 
         saveButton.setOnClickListener(onSaveButtonClickListener);
+
+        Transaction izmijeni = (Transaction) getIntent().getSerializableExtra("transaction");
+        if (izmijeni != null) {
+            editTransaction = izmijeni;
+            edit = true;
+
+            Type type = izmijeni.getType();
+            Date date = izmijeni.getDate();
+            title.setText(izmijeni.getTitle());
+            amountEdit.setText(String.format("%.2f", izmijeni.getAmount()));
+            typeSpinner.setSelection(izmijeni.getTypeId(type));
+
+            String dayString = (String) DateFormat.format("dd", date);
+            String monthString = (String) DateFormat.format("MM", date);
+            String yearString = (String) DateFormat.format("yyyy", date);
+            int day = Integer.parseInt(dayString);
+            int month = Integer.parseInt(monthString) - 1;
+            int year = Integer.parseInt(yearString);
+            choseDate.init(year, month, day, null);
+
+            String description = izmijeni.getItemDescription();
+            if (description != null) descriptionTransaction.setText(description);
+
+            Date endDate = izmijeni.getEndDate();
+            if (endDate != null) {
+                String edayString = (String) DateFormat.format("dd", endDate);
+                String emonthString = (String) DateFormat.format("MM", endDate);
+                String eyearString = (String) DateFormat.format("yyyy", endDate);
+                int eday = Integer.parseInt(edayString);
+                int emonth = Integer.parseInt(emonthString) - 1;
+                int eyear = Integer.parseInt(eyearString);
+                endDateTransaction.init(eyear, emonth, eday, null);
+            }
+
+            Integer interval = izmijeni.getTransactionInterval();
+            if (interval != null) {
+                intervalOfTransaction.setText(interval);
+            }
+            deleteButton.setEnabled(true);
+        } else {
+            deleteButton.setEnabled(false);
+        }
+
     }
+
 
     private AdapterView.OnItemSelectedListener onItemSelectedClickListener = new AdapterView.OnItemSelectedListener() {
         @Override
@@ -136,9 +183,12 @@ public class AddTransaction extends AppCompatActivity {
     private View.OnClickListener onSaveButtonClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
+            boolean correctTtitle = true;
+
             titleTransaction = String.valueOf(title.getText());
             if (!validirajTitle(title.getText())) {
                 title.setBackgroundColor(Color.RED);
+                correctTtitle = false;
             } else title.setBackgroundColor(Color.GREEN);
 
             amountTransaction = Double.parseDouble(String.valueOf(amountEdit.getText()));
@@ -150,7 +200,7 @@ public class AddTransaction extends AppCompatActivity {
             Calendar calendar1 = Calendar.getInstance();
             calendar1.set(year, month, day);
             dateTransaction = calendar1.getTime();
-
+            //System.out.println("datum nakon edit " + dateTransaction + "   datum editovane " + editTransaction.getDate());
             //end date
             int d1, m1, y1;
             d1 = endDateTransaction.getDayOfMonth();
@@ -169,7 +219,7 @@ public class AddTransaction extends AppCompatActivity {
                     endDateTransaction1 = null;
                     break;
                 case REGULARPAYMENT:
-                   // descriptionOfTransaction = null;
+                    // descriptionOfTransaction = null;
                     intervalTransaction = Integer.parseInt(String.valueOf(intervalOfTransaction.getText()));
                     break;
                 case PURCHASE:
@@ -190,8 +240,42 @@ public class AddTransaction extends AppCompatActivity {
                     break;
             }
 
-            Transaction nova = new Transaction(dateTransaction, amountTransaction, titleTransaction, type, descriptionOfTransaction, intervalTransaction, endDateTransaction1);
-            //dodajTransakciju(nova);
+            //Transaction nova = new Transaction(dateTransaction, amountTransaction, titleTransaction, type, descriptionOfTransaction, intervalTransaction, endDateTransaction1);
+            if (editTransaction != null) {
+
+                Date date = editTransaction.getDate();
+                String dayString = (String) DateFormat.format("dd", date);
+                String monthString = (String) DateFormat.format("MM", date);
+                String yearString = (String) DateFormat.format("yyyy", date);
+                int day1 = Integer.parseInt(dayString);
+                int month1 = Integer.parseInt(monthString) - 1;
+                int year1 = Integer.parseInt(yearString);
+
+                if (!titleTransaction.equals(editTransaction.getTitle()) && correctTtitle) {
+                    title.setBackgroundColor(Color.GREEN);
+                }
+                if (type != editTransaction.getType()) typeSpinner.setBackgroundColor(Color.GREEN);
+                if (day != day1 || month != month1 || year != year1) {
+                    choseDate.setBackgroundColor(Color.GREEN);
+                }
+                if (endDateTransaction1 != null) {
+                    Date endDate = editTransaction.getEndDate();
+                    String edayString = (String) DateFormat.format("dd", endDate);
+                    String emonthString = (String) DateFormat.format("MM", endDate);
+                    String eyearString = (String) DateFormat.format("yyyy", endDate);
+                    int eday = Integer.parseInt(edayString);
+                    int emonth = Integer.parseInt(emonthString) - 1;
+                    int eyear = Integer.parseInt(eyearString);
+                    if (d1 != eday || m1 != emonth || y1 != eyear)
+                        endDateTransaction.setBackgroundColor(Color.GREEN);
+                }
+                if (amountTransaction != editTransaction.getAmount())
+                    amountEdit.setBackgroundColor(Color.GREEN);
+                if (descriptionOfTransaction != null && !descriptionOfTransaction.equals(editTransaction.getItemDescription()))
+                    descriptionTransaction.setBackgroundColor(Color.GREEN);
+                if (intervalTransaction != null && intervalTransaction != editTransaction.getTransactionInterval())
+                    intervalOfTransaction.setBackgroundColor(Color.GREEN);
+            }
             Intent i = new Intent();
             Bundle b = new Bundle();
             b.putString("title", titleTransaction);
@@ -201,37 +285,17 @@ public class AddTransaction extends AppCompatActivity {
             b.putSerializable("interval", intervalTransaction);
             b.putSerializable("date", dateTransaction);
             b.putSerializable("endDate", endDateTransaction1);
-            //System.out.println("ime novododane transakcije" + transaction.getTitle()+" " + transaction.getDate());
             i.putExtras(b);
-            setResult(3, i);
-
-            finish();
+            if (!edit && correctTtitle) {
+                setResult(3, i);
+                finish();
+            } else if (edit && correctTtitle) {
+                setResult(4, i);
+                finish();
+            }
         }
     };
 
-    private void dodajTransakciju(Transaction nova) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
-        String date = dateFormat.format(nova.getDate());
-        Type type = nova.getType();
-        int typeId = nova.getTypeId(type);
-        String query = "{\n" +
-                "\"title\" : " + "\"" + nova.getTitle() + "\"" + "\n" +
-                "\"date\" : " + "\"" + date + "\"" + "\n" +
-                "\"TransactionTypeId\" : " + typeId + "\n" +
-                "\"amount\" : " + nova.getAmount() + "\n";
-
-        if (typeId == 1 || typeId == 2) {
-            String endDate = dateFormat.format(nova.getEndDate());
-            query += "\"endDate\" : " + "\"" + endDate + "\"" + "\n" +
-                    "\"transactionInterval\" : " + nova.getTransactionInterval() + "\n";
-        }
-        if (typeId != 2 && typeId != 4) {
-            query += "\"itemDescription\" : " + "\"" + nova.getItemDescription() + "\"" + "\n";
-        }
-
-        query += "\n}";
-        System.out.println(query);
-    }
 
     private boolean validirajTitle(Editable text) {
         String s = String.valueOf(text);

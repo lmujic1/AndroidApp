@@ -15,6 +15,8 @@ public interface ITransactionListPresenter {
     void addTransaction(Transaction nova);
 
     void deleteTransaction(Transaction izabranaTransakcija);
+
+    void editTransaction(Transaction nova, Transaction izabranaTransakcija);
     /*void refreshTransaction();
     void refreshTransactionOnDate(Date date);
     void refreshTransactionSort(String string);
