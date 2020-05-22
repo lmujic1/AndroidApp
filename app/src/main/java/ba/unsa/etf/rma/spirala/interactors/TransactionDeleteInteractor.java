@@ -7,25 +7,18 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 
-import ba.unsa.etf.rma.spirala.activities.PocetnaAktivnost;
-import ba.unsa.etf.rma.spirala.models.Transaction;
 
 public class TransactionDeleteInteractor extends AsyncTask<String, Integer, Void> {
     private String mainURL = "http://rma20-app-rmaws.apps.us-west-1.starter.openshift-online.com/account/";
     private String api_id = "7a4c053e-81fb-42ec-847b-b356864911dc";
-    private Transaction transaction;
-    private OnTransactionGetDone caller;
 
 
-    public TransactionDeleteInteractor(OnTransactionGetDone p, Transaction transaction) {
-        this.transaction = transaction;
-        caller = p;
+    public TransactionDeleteInteractor() {
     }
 
     @Override
@@ -75,11 +68,6 @@ public class TransactionDeleteInteractor extends AsyncTask<String, Integer, Void
     @Override
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
-        PocetnaAktivnost.transactionListAdapter.delete(transaction);
-        //caller.onAddDone(transaction);
     }
 
-    public interface OnTransactionGetDone {
-        public void onDeleteDone(Transaction results);
-    }
 }

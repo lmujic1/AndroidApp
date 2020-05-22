@@ -21,8 +21,6 @@ public class SpinnerAdapter extends BaseAdapter {
 
     public SpinnerAdapter(Context context) {
         this.context = context;
-
-        //= listaTipovaTransakcija;
     }
 
     public void dodajFiltereZaSortiranje() {

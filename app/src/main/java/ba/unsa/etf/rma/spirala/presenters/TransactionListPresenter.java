@@ -15,7 +15,7 @@ import ba.unsa.etf.rma.spirala.activities.PocetnaAktivnost;
 import ba.unsa.etf.rma.spirala.interactors.TransactionListInteractor;
 import ba.unsa.etf.rma.spirala.models.Transaction;
 
-public class TransactionListPresenter implements ITransactionListPresenter, TransactionListInteractor.OnTransactionGetDone, TransactionAddInteractor.OnTransactionGetDone, TransactionDeleteInteractor.OnTransactionGetDone {
+public class TransactionListPresenter implements ITransactionListPresenter, TransactionListInteractor.OnTransactionGetDone {
 
     private ITransactionListView view;
     private Context context;
@@ -128,13 +128,13 @@ public class TransactionListPresenter implements ITransactionListPresenter, Tran
         }
         query += "\n}";
         System.out.println(query);
-        new TransactionAddInteractor((TransactionAddInteractor.OnTransactionGetDone) this, nova).execute(query);
+        new TransactionAddInteractor(nova).execute(query);
     }
 
     @Override
     public void deleteTransaction(Transaction izabranaTransakcija) {
         String query = "/" + izabranaTransakcija.getIdTransaction();
-        new TransactionDeleteInteractor((TransactionDeleteInteractor.OnTransactionGetDone) this, izabranaTransakcija).execute(query);
+        new TransactionDeleteInteractor().execute(query);
     }
 
     @Override
@@ -203,69 +203,4 @@ public class TransactionListPresenter implements ITransactionListPresenter, Tran
         view.setTransactions(results);
         view.notifyTransactionListDataSetChanged();
     }
-
-    @Override
-    public void onAddDone(Transaction results) {
-        // view.addTransaction(results);
-        view.notifyTransactionListDataSetChanged();
-    }
-
-    @Override
-    public void onDeleteDone(Transaction results) {
-        view.notifyTransactionListDataSetChanged();
-    }
-
-
-
-
-   /*
-
-    @Override
-    public void refreshTransactionSort(String string) {
-        view.sort(string);
-        view.notifyTransactionListDataSetChanged();
-    }
-
-    @Override
-    public void refreshTransactionFilter(Date date, String string) {
-        view.clearListOfTransactions();
-        ArrayList<Transaction> transactions = new ArrayList<>(), pom = new ArrayList<>();
-        transactions.addAll(interactor.getOnMonth(date));
-        pom.addAll(filter(string, transactions));
-        view.setTransactions(pom);
-        view.notifyTransactionListDataSetChanged();
-    }
-
-    @Override
-    public void refreshTransactionDelete(Transaction transaction) {
-        view.removeTransaction(transaction);
-        view.notifyTransactionListDataSetChanged();
-    }
-
-    @Override
-    public void refreshTransactionAdd(Transaction trans) {
-        view.addTransaction(trans);
-        view.notifyTransactionListDataSetChanged();
-    }
-
- *//*   @Override
-    public void refreshTransactionDelete(Date date, ArrayList<Transaction> transactions) {
-        //view.clearListOfTransactions();
-        ArrayList<Transaction> transactions1 = new ArrayList<>();
-        transactions1.addAll(interactor.getOnMonthAndDeleteTransactions(date,transactions));
-        view.setTransactions(transactions1);
-        view.notifyTransactionListDataSetChanged();
-    }*//*
-
-
-
-    public ArrayList<Transaction> filter(String filter, ArrayList<Transaction> transactions) {
-        ArrayList<Transaction> filtrirani = new ArrayList<>();
-        for (Transaction t : transactions) {
-            if (!t.getType().toString().equals(filter)) filtrirani.add(t);
-        }
-        transactions.removeAll(filtrirani);
-        return transactions;
-    }*/
-
 }

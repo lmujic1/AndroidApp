@@ -22,7 +22,6 @@ public class FiltrirajAdapter extends BaseAdapter {
     public FiltrirajAdapter(Context context) {
         this.context = context;
         this.listaTipovaTransakcija = new ArrayList<>(Arrays.asList("Filter by", "All transactions", "Individual payment", "Regular payment", "Purchase", "Individual income", "Regular income"));
-        //= listaTipovaTransakcija;
     }
 
     @Override

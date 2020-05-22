@@ -50,7 +50,4 @@ public class TransactionModel {
         return transactions;
     }
 
-    public static void deleteTransaction(Transaction transaction) {
-        transactions.remove(transaction);
-    }
 }

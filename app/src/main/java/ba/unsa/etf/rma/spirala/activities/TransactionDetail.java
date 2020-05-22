@@ -73,44 +73,6 @@ public class TransactionDetail extends AppCompatActivity{
 
     private Transaction transaction;
 
-   /* @Nullable
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-
-        View view = inflater.inflate(R.layout.detalji_transakcije, container, false);
-        if (getArguments() != null && getArguments().containsKey("transaction")) {
-
-            getPresenterDetail().setTransaction(getArguments().getParcelable("transaction"));
-
-            titleTransakcije = (TextView) view.findViewById(R.id.title);
-            typeTransakcije = (TextView) view.findViewById(R.id.typeOftransaction);
-            opisTransakcije = (TextView) view.findViewById(R.id.itemDescription);
-            dateTransakcije = (TextView) view.findViewById(R.id.date);
-            intervalTransakcije = (TextView) view.findViewById(R.id.transactionInterval);
-            endTransakcije = (TextView) view.findViewById(R.id.endDate);
-            iznosTransakcije = (TextView) view.findViewById(R.id.amount);
-            saveButton = (Button) view.findViewById(R.id.saveButton);
-            deleteButton = (Button) view.findViewById(R.id.deleteButton);
-
-            transaction = getPresenterDetail().getTransaction();
-            titleTransakcije.setText(transaction.getTitle());
-            iznosTransakcije.setText(String.format("%.2f", transaction.getAmount()) + " BAM");
-            dateTransakcije.setText(transaction.getDate1(transaction.getDate()));
-            typeTransakcije.setText(transaction.getType().toString());
-            opisTransakcije.setText(transaction.getItemDescription());
-
-            intervalTransakcije.setText(String.valueOf(transaction.getTransactionInterval()) + " days");
-            if (transaction.getEndDate() == null)
-                endTransakcije.setText(transaction.getDate1(transaction.getDate()));
-            else endTransakcije.setText(transaction.getDate1(transaction.getEndDate()));
-
-            AlertDialog.Builder alertDialog = new AlertDialog.Builder(getContext());
-            deleteButton.setOnClickListener(deleteTransactionOnClickListener);
-
-        }
-        return view;
-    }*/
-
     private View.OnClickListener deleteTransactionOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {

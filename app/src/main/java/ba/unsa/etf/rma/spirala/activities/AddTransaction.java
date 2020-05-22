@@ -1,5 +1,7 @@
 package ba.unsa.etf.rma.spirala.activities;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -52,7 +54,6 @@ public class AddTransaction extends AppCompatActivity {
 
     private boolean edit = false;
     private Transaction editTransaction;
-    //public static Transaction transaction;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -118,6 +119,7 @@ public class AddTransaction extends AppCompatActivity {
                 intervalOfTransaction.setText(interval);
             }
             deleteButton.setEnabled(true);
+            deleteButton.setOnClickListener(deleteTransactionOnClickListener);
         } else {
             deleteButton.setEnabled(false);
         }
@@ -200,8 +202,6 @@ public class AddTransaction extends AppCompatActivity {
             Calendar calendar1 = Calendar.getInstance();
             calendar1.set(year, month, day);
             dateTransaction = calendar1.getTime();
-            //System.out.println("datum nakon edit " + dateTransaction + "   datum editovane " + editTransaction.getDate());
-            //end date
             int d1, m1, y1;
             d1 = endDateTransaction.getDayOfMonth();
             m1 = endDateTransaction.getMonth();
@@ -296,6 +296,34 @@ public class AddTransaction extends AppCompatActivity {
         }
     };
 
+    private View.OnClickListener deleteTransactionOnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            final AlertDialog.Builder builder = new AlertDialog.Builder(AddTransaction.this);
+            builder.setTitle("Select your answer.");
+            builder.setMessage("Want to delete transaction?");
+            DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    switch (which) {
+                        case DialogInterface.BUTTON_POSITIVE:
+                            Intent intent = new Intent();
+                            setResult(2,intent);
+                            finish();
+                            break;
+                        case DialogInterface.BUTTON_NEGATIVE:
+                            break;
+                    }
+                }
+            };
+            builder.setPositiveButton("Yes", dialogClickListener);
+            builder.setNegativeButton("No", dialogClickListener);
+            AlertDialog dialog = builder.create();
+            dialog.show();
+
+
+        }
+    };
 
     private boolean validirajTitle(Editable text) {
         String s = String.valueOf(text);

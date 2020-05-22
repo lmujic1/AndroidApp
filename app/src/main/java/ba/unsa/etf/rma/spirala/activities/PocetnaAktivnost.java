@@ -118,10 +118,7 @@ public class PocetnaAktivnost extends AppCompatActivity implements ITransactionL
         lVTransakcije.setOnItemClickListener(listaTransakcijaCLickListener);
         lVTransakcije.setOnItemLongClickListener(editTransactionClickListener);
 
-        //getPresenter().refreshTransactionOnDate(defaultDate);
-
         getPresenter().getTransactionOnDate(defaultDate);
-        //onItemClick = (OnItemClick) getActivity();
 
         prevMonth.setOnClickListener(prevMonthOnClickListener);
         nextMonth.setOnClickListener(nextMonthClickListener);
@@ -167,7 +164,6 @@ public class PocetnaAktivnost extends AppCompatActivity implements ITransactionL
 
     private void showTheTransaction(Transaction transaction) {
         Intent transactionDetailIntent = new Intent(PocetnaAktivnost.this, TransactionDetail.class);
-        //transactionDetailIntent.putExtra("title", transaction.getTitle());
         transactionDetailIntent.putExtra("transaction", transaction);
         startActivityForResult(transactionDetailIntent, 10);
     }
@@ -178,7 +174,6 @@ public class PocetnaAktivnost extends AppCompatActivity implements ITransactionL
             Date dat = getDatum((String) tDefaultDate.getText());
             defaultDate = izracunajMjesec(dat, -1);
             tDefaultDate.setText(dateFormat.format(defaultDate));
-            //getPresenter().getTransactions("");
             getPresenter().getTransactionOnDate(defaultDate);
 
 
@@ -192,7 +187,6 @@ public class PocetnaAktivnost extends AppCompatActivity implements ITransactionL
             defaultDate = izracunajMjesec(dat, 1);
             tDefaultDate.setText(dateFormat.format(defaultDate));
             getPresenter().getTransactionOnDate(defaultDate);
-            //    getPresenter().refreshTransactionOnDate(defaultDate);
         }
     };
 
@@ -217,10 +211,8 @@ public class PocetnaAktivnost extends AppCompatActivity implements ITransactionL
             String selectedItemText = (String) parent.getItemAtPosition(position);
             if (selectedItemText.equals("All transactions") || selectedItemText.equals("Filter by")) {
                 getPresenter().getTransactionOnDate(defaultDate);
-                // getPresenter().refreshTransactionOnDate(defaultDate);
             } else {
                 getPresenter().getFilteredTransacion(selectedItemText);
-                //   getPresenter().refreshTransactionFilter(defaultDate, selectedItemText);
             }
         }
 
@@ -299,6 +291,7 @@ public class PocetnaAktivnost extends AppCompatActivity implements ITransactionL
         if (resultCode == 2) {
             if (data != null) {
                 getPresenter().deleteTransaction(izabranaTransakcija);
+                getPresenter().getTransactionOnDate(defaultDate);
             }
         } else if (requestCode == 3) {
             if (data != null

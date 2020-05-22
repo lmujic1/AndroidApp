@@ -1,57 +1,15 @@
 package ba.unsa.etf.rma.spirala.models;
 
-import android.os.Parcel;
-import android.os.Parcelable;
+
 
 import androidx.annotation.NonNull;
 
 import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.util.Comparator;
 import java.util.Date;
 
 public class Transaction implements Serializable {
-
-
-/*    protected Transaction(Parcel in) {
-        amount = in.readDouble();
-        title = in.readString();
-        type = Type.valueOf(in.readString());
-        date = new Date(in.readLong());
-        itemDescription = in.readString();
-        transactionInterval = in.readInt();
-        endDate = new Date(in.readLong());
-    }
-
-    public static final Creator<Transaction> CREATOR = new Creator<Transaction>() {
-        @Override
-        public Transaction createFromParcel(Parcel in) {
-            return new Transaction(in);
-        }
-
-        @Override
-        public Transaction[] newArray(int size) {
-            return new Transaction[size];
-        }
-    };
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeDouble(amount);
-        dest.writeString(title);
-        dest.writeString(type.toString());
-        dest.writeLong(date.getTime());
-        if(endDate != null) dest.writeLong(endDate.getTime());
-        dest.writeString(itemDescription);
-        dest.writeInt(transactionInterval);
-    }*/
 
     public enum Type {
         REGULARPAYMENT("Regular payment"),

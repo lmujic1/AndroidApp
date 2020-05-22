@@ -18,20 +18,14 @@ public class TransactionEditInteractor extends AsyncTask<String, Integer, Void> 
     private String mainURL = "http://rma20-app-rmaws.apps.us-west-1.starter.openshift-online.com/account/";
     private String api_id = "7a4c053e-81fb-42ec-847b-b356864911dc";
     private Transaction transaction;
-    //private TransactionAddInteractor.OnTransactionGetDone caller;
-
 
     public TransactionEditInteractor(Transaction transaction) {
         this.transaction = transaction;
-        //  caller = p;
     }
 
     @Override
     protected Void doInBackground(String... strings) {
-        Transaction.Type type = transaction.getType();
-        int tip = transaction.getTypeId(type);
         String url1 = mainURL + api_id + "/transactions" + "/" + transaction.getIdTransaction();
-        System.out.println("OVO TREBAM: " + url1);
         String forEdit = strings[0];
         try {
             URL url = new URL(url1);
@@ -47,9 +41,6 @@ public class TransactionEditInteractor extends AsyncTask<String, Integer, Void> 
                 os.write(input, 0, input.length);
             }
 
-            //int responseCode=postConnection.getResponseCode();
-            //System.out.println("RESPONSE CODE " + responseCode);
-            //InputStream in = postConnection.getInputStream();
             try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(postConnection.getInputStream(), "utf-8"))) {
 
                 StringBuilder response = new StringBuilder();
@@ -59,7 +50,6 @@ public class TransactionEditInteractor extends AsyncTask<String, Integer, Void> 
                 }
 
                 Log.d("RESPONSE", response.toString());
-                //System.out.println("Transakcija je dodana");
             }
         } catch (MalformedURLException e) {
             e.printStackTrace();
@@ -75,11 +65,6 @@ public class TransactionEditInteractor extends AsyncTask<String, Integer, Void> 
     @Override
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
-        //PocetnaAktivnost.transactionListAdapter.dodajTransakciju(transaction);
-        //caller.onAddDone(transaction);
     }
 
-    public interface OnTransactionGetDone {
-        public void onAddDone(Transaction results);
-    }
 }

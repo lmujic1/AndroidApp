@@ -18,7 +18,7 @@ import java.util.ArrayList;
 
 import ba.unsa.etf.rma.spirala.models.Transaction;
 
-public class TransactionListInteractor extends AsyncTask<String, Integer, Void> /*implements ITransactionListInteractor*/ {
+public class TransactionListInteractor extends AsyncTask<String, Integer, Void> implements ITransactionListInteractor {
 
     private String glavniURL = "http://rma20-app-rmaws.apps.us-west-1.starter.openshift-online.com/account/";
     private String api_id = "7a4c053e-81fb-42ec-847b-b356864911dc";
@@ -139,7 +139,6 @@ public class TransactionListInteractor extends AsyncTask<String, Integer, Void> 
                         String endDate = transaction.getString("endDate");
                         int transactionTypeId = transaction.getInt("TransactionTypeId");
 
-                       // System.out.println("DEŠAVA LI SE IŠTA?" + transactionTypeId);
                         Transaction transaction1 = new Transaction(idTransaction, date, amount, tite, transactionTypeId, itemDescription, transactionInterval, endDate);
                         regularTransactions.add(transaction1);
                     }
