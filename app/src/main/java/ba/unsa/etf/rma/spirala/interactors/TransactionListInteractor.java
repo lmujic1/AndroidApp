@@ -156,34 +156,6 @@ public class TransactionListInteractor extends AsyncTask<String, Integer, Void> 
         //     izbaciRegularne(regularTransactions);
         return null;
     }
-
-   /* protected Void AddInformationAboutAccount(String... params) {
-        URL url = null;
-        String url1 = "http://rma20-app-rmaws.apps.us-west-1.starter.openshift-online.com/account/" + api_id;
-        try {
-            url = new URL(url1);
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
-        try {
-            HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-            InputStream is = new BufferedInputStream(urlConnection.getInputStream());
-            String result = convertStreamToString(is);
-            JSONObject jsonObject = new JSONObject(result);
-
-            int id = jsonObject.getInt("id");
-            double budget = jsonObject.getDouble("budget");
-            double totalLimit = jsonObject.getDouble("totalLimit");
-            double monthLimit = jsonObject.getDouble("monthLimit");
-            PocetnaAktivnost.account = new Account(id, budget, totalLimit, monthLimit);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }*/
-
     @Override
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
@@ -193,14 +165,5 @@ public class TransactionListInteractor extends AsyncTask<String, Integer, Void> 
     public interface OnTransactionGetDone {
         public void onGetDone(ArrayList<Transaction> results);
     }
-
-
-   /* @Override
-    public ArrayList<Transaction> getOnMonthAndDeleteTransactions(Date date, ArrayList<Transaction> transactions) {
-        ArrayList<Transaction> transactions1 = getOnMonth(date);
-        transactions1.removeAll(transactions);
-        return  transactions1;
-    }*/
-
 
 }

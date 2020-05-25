@@ -185,7 +185,7 @@ public class AddTransaction extends AppCompatActivity {
     private View.OnClickListener onSaveButtonClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            boolean correctTtitle = true, correctAmmount = true;
+            boolean correctTtitle = true, correctAmmount = true,correctEndDate=true;
 
             titleTransaction = String.valueOf(title.getText());
             if (!validirajTitle(title.getText())) {
@@ -246,7 +246,10 @@ public class AddTransaction extends AppCompatActivity {
                     intervalTransaction = Integer.parseInt(String.valueOf(intervalOfTransaction.getText()));
                     break;
             }
-
+            if(endDateTransaction1!=null && endDateTransaction1.before(dateTransaction)) {
+                endDateTransaction.setBackgroundColor(Color.RED);
+                correctEndDate = false;
+            }
             //Transaction nova = new Transaction(dateTransaction, amountTransaction, titleTransaction, type, descriptionOfTransaction, intervalTransaction, endDateTransaction1);
             if (editTransaction != null) {
 
@@ -265,7 +268,7 @@ public class AddTransaction extends AppCompatActivity {
                 if (day != day1 || month != month1 || year != year1) {
                     choseDate.setBackgroundColor(Color.GREEN);
                 }
-                if (endDateTransaction1 != null) {
+                if (endDateTransaction1 != null && correctEndDate) {
                     Date endDate = editTransaction.getEndDate();
                     String edayString = (String) DateFormat.format("dd", endDate);
                     String emonthString = (String) DateFormat.format("MM", endDate);
@@ -296,10 +299,10 @@ public class AddTransaction extends AppCompatActivity {
             b.putSerializable("date", dateTransaction);
             b.putSerializable("endDate", endDateTransaction1);
             i.putExtras(b);
-            if (!edit && correctTtitle && correctAmmount) {
+            if (!edit && correctTtitle && correctAmmount && correctEndDate) {
                 setResult(3, i);
                 finish();
-            } else if (edit && correctTtitle && correctAmmount) {
+            } else if (edit && correctTtitle && correctAmmount && correctEndDate) {
                 setResult(4, i);
                 finish();
             }
