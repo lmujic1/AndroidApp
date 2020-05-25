@@ -18,11 +18,6 @@ import ba.unsa.etf.rma.spirala.models.Account;
 public class UpdateAccountInteractor extends AsyncTask<String,Integer,Void> {
     private String mainURL = "http://rma20-app-rmaws.apps.us-west-1.starter.openshift-online.com/account/";
     private String api_id = "7a4c053e-81fb-42ec-847b-b356864911dc";
-   // private Account account;
-
-    //public UpdateAccountInteractor(Account account) {
-    //    this.account = account;
-    //}
 
     @Override
     protected Void doInBackground(String... strings) {
@@ -65,14 +60,5 @@ public class UpdateAccountInteractor extends AsyncTask<String,Integer,Void> {
     @Override
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
-        /*PocetnaAktivnost.handler.post(new Runnable() {
-            @Override
-            public void run() {
-                String budget = String.valueOf(account.getBudget());
-                String mlimit = String.valueOf(account.getMonthLimit());
-                PocetnaAktivnost.tVAmount.setText("Budget: " + budget);
-                PocetnaAktivnost.tVLimit.setText("Month limit: " + mlimit);
-            }
-        });*/
     }
 }

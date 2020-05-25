@@ -89,7 +89,7 @@ public class AddTransaction extends AppCompatActivity {
             Type type = izmijeni.getType();
             Date date = izmijeni.getDate();
             title.setText(izmijeni.getTitle());
-            amountEdit.setText(String.format("%.2f", izmijeni.getAmount()));
+            amountEdit.setText(String.format(java.util.Locale.US,"%.2f", izmijeni.getAmount()));
             typeSpinner.setSelection(izmijeni.getTypeId(type));
 
             String dayString = (String) DateFormat.format("dd", date);
@@ -194,7 +194,7 @@ public class AddTransaction extends AppCompatActivity {
             } else title.setBackgroundColor(Color.GREEN);
             String am = String.valueOf(amountEdit.getText());
             if (am.equals("")) {
-                System.out.println("DA LI JE OVDJE");
+                //System.out.println("DA LI JE OVDJE");
                 amountEdit.setBackgroundColor(Color.RED);
                 correctAmmount = false;
             } else if (!am.equals("")) {

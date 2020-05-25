@@ -53,7 +53,7 @@ public class AccountInteractor extends AsyncTask<String, Integer, Void> {
     protected Void doInBackground(String... strings) {
         URL url = null;
         String url1 = mainURL + api_id;
-        System.out.println(url1 + " u accountI");
+        //System.out.println(url1 + " u accountI");
         try {
             url = new URL(url1);
             HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
