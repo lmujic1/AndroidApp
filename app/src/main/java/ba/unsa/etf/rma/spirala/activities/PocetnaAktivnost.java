@@ -90,9 +90,11 @@ public class PocetnaAktivnost extends AppCompatActivity implements ITransactionL
             for (Transaction t : offlineDodavanje) {
                 getPresenter().addTransaction(t);
             }
+            offlineDodavanje.clear();
             for (Transaction t : offlineBrisanje) {
                 getPresenter().deleteTransaction(t);
             }
+            offlineBrisanje.clear();
             getPresenter().getTransactionOnDate(defaultDate);
 
         }
@@ -263,8 +265,9 @@ public class PocetnaAktivnost extends AppCompatActivity implements ITransactionL
                 if (isNetworkAvailable()) {
                     getPresenter().deleteTransaction(izabranaTransakcija);
                     getPresenter().getTransactionOnDate(defaultDate);
-                    editAccount(izabranaTransakcija, 2);
-                    getInfoAboutAccount();
+                    getPresenter().deleteTransactionDB(izabranaTransakcija);
+                    //editAccount(izabranaTransakcija, 2);
+                    //getInfoAboutAccount();
                 } else {
                     Toast.makeText(getApplicationContext(), "Offline brisanje", Toast.LENGTH_SHORT).show();
                     offlineBrisanje.add(izabranaTransakcija);
@@ -312,8 +315,8 @@ public class PocetnaAktivnost extends AppCompatActivity implements ITransactionL
                 if (isNetworkAvailable()) {
                     getPresenter().addTransaction(nova);
                     getPresenter().getTransactionOnDate(defaultDate);
-                    editAccount(nova, 3);
-                    getInfoAboutAccount();
+                    //editAccount(nova, 3);
+                    //getInfoAboutAccount();
                 } else {
                     Toast.makeText(getApplicationContext(), "Offline dodavanje", Toast.LENGTH_SHORT).show();
                     nova.setOffMode("Offline dodavanje");
@@ -362,8 +365,8 @@ public class PocetnaAktivnost extends AppCompatActivity implements ITransactionL
                 if (isNetworkAvailable()) {
                     getPresenter().editTransaction(nova, izabranaTransakcija);
                     getPresenter().getTransactionOnDate(defaultDate);
-                    editAccount(nova, izabranaTransakcija, 3);
-                    getInfoAboutAccount();
+                   // editAccount(nova, izabranaTransakcija, 3);
+                   // getInfoAboutAccount();
                 } else {
                     Toast.makeText(getApplicationContext(), "Offline izmjena", Toast.LENGTH_SHORT).show();
                     izabranaTransakcija.setOffMode("Offline izmjena");

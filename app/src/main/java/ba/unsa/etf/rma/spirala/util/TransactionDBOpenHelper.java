@@ -56,14 +56,36 @@ public class TransactionDBOpenHelper extends SQLiteOpenHelper {
     private static final String TRANSACTION_DROP = "DROP TABLE IF EXISTS " + TRANSACTION_TABLE;
 
 
+    public static int accountID = 0;
+    public static final String ACCOUNT_TABLE = "accounts";
+    public static final String ACCOUNT_INTERNAL_ID = "_id";
+    public static final String ACCOUNT_ID = "id";
+    public static final String ACCOUNT_BUDGET = "budget";
+    public static final String ACCOUNT_MONTH_LIMIT = "monthLimit";
+    public static final String ACCOUNT_TOTAL_LIMIT = "totalLimit";
+
+    public static final String ACCOUNT_TABLE_CREATE =
+            "CREATE TABLE IF NOT EXISTS " + ACCOUNT_TABLE
+                    + " ("
+                    + ACCOUNT_INTERNAL_ID + "INTEGER PRIMARY KEY AUTOINCREMENT, "
+                    + ACCOUNT_ID + " INTEGER UNIQUE,"
+                    + ACCOUNT_BUDGET + " REAL NOT NULL,"
+                    + ACCOUNT_MONTH_LIMIT + " REAL NOT NULL,"
+                    + ACCOUNT_TOTAL_LIMIT + " REAL NOT NULL);";
+
+    public static final String ACCOUNT_DROP = "DROP TABLE IF EXISTS " + ACCOUNT_TABLE;
+
+
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(TRANSACTION_TABLE_CREATE);
+        db.execSQL(ACCOUNT_TABLE_CREATE);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL(TRANSACTION_DROP);
+        db.execSQL(ACCOUNT_DROP);
         onCreate(db);
     }
 

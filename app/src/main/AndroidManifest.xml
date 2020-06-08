@@ -30,9 +30,13 @@
                 <data android:mimeType="text/*" />
             </intent-filter>
         </activity>
+
         <provider
-            android:authorities="rma.provider.transactions"
-            android:name=".util.TransactionContentProvider"/>
+            android:name=".util.TransactionContentProvider"
+            android:authorities="rma.provider.transactions" />
+        <provider
+            android:name=".util.AccountContentProvider"
+            android:authorities="rma.provider.accounts" />
     </application>
 
 </manifest>

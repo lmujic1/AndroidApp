@@ -1,5 +1,9 @@
 package ba.unsa.etf.rma.spirala.interactors;
 
+import android.content.ContentResolver;
+import android.content.ContentValues;
+import android.content.Context;
+import android.net.Uri;
 import android.os.AsyncTask;
 
 import org.json.JSONException;
@@ -17,9 +21,10 @@ import java.net.URL;
 
 import ba.unsa.etf.rma.spirala.activities.PocetnaAktivnost;
 import ba.unsa.etf.rma.spirala.models.Account;
+import ba.unsa.etf.rma.spirala.util.TransactionDBOpenHelper;
 
 
-public class AccountInteractor extends AsyncTask<String, Integer, Void> {
+public class AccountInteractor extends AsyncTask<String, Integer, Void> implements IAccountInteractor {
     private String mainURL = "http://rma20-app-rmaws.apps.us-west-1.starter.openshift-online.com/account/";
     private String api_id = "7a4c053e-81fb-42ec-847b-b356864911dc";
     private Account account;
@@ -67,7 +72,7 @@ public class AccountInteractor extends AsyncTask<String, Integer, Void> {
             double monthLimit = jsonObject.getDouble("monthLimit");
 
             account = new Account(id, budget, totalLimit, monthLimit);
-            PocetnaAktivnost.account=account;
+            PocetnaAktivnost.account = account;
 
         } catch (MalformedURLException e) {
             e.printStackTrace();
@@ -94,4 +99,34 @@ public class AccountInteractor extends AsyncTask<String, Integer, Void> {
         });
     }
 
+
+    @Override
+    public Account getAccountDetail(Context context) {
+        return null;
+    }
+
+    @Override
+    public void editAccount(Context context, double budget, double monthLimit, double totalLimit) {
+        ContentResolver contentResolver = context.getApplicationContext().getContentResolver();
+        Uri adresa = Uri.parse("content://rma.provider.accounts/elements");
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(TransactionDBOpenHelper.ACCOUNT_BUDGET, budget);
+        contentValues.put(TransactionDBOpenHelper.ACCOUNT_MONTH_LIMIT, monthLimit);
+        contentValues.put(TransactionDBOpenHelper.ACCOUNT_TOTAL_LIMIT, totalLimit);
+        String where = TransactionDBOpenHelper.ACCOUNT_ID + "=" + TransactionDBOpenHelper.accountID;
+        String[] whereArgs = null;
+        contentResolver.update(adresa,contentValues,where,whereArgs);
+    }
+
+    @Override
+    public void insertDetailAccount(Context context, double budget, double monthLimit, double totalLimit) {
+        ContentResolver contentResolver = context.getApplicationContext().getContentResolver();
+        Uri adresa = Uri.parse("content://rma.provider.accounts/elements");
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(TransactionDBOpenHelper.ACCOUNT_ID, TransactionDBOpenHelper.accountID);
+        contentValues.put(TransactionDBOpenHelper.ACCOUNT_BUDGET, budget);
+        contentValues.put(TransactionDBOpenHelper.ACCOUNT_MONTH_LIMIT, monthLimit);
+        contentValues.put(TransactionDBOpenHelper.ACCOUNT_TOTAL_LIMIT, totalLimit);
+        contentResolver.insert(adresa, contentValues);
+    }
 }
