@@ -26,6 +26,7 @@ import ba.unsa.etf.rma.spirala.models.Transaction;
 
 public class TransactionListAdapter extends ArrayAdapter<Transaction> {
     int resource;
+    public static TextView offlineMode;
 
     public TransactionListAdapter(@NonNull Context context, int resource, ArrayList<Transaction> transactions) {
         super(context, resource, transactions);
@@ -52,9 +53,11 @@ public class TransactionListAdapter extends ArrayAdapter<Transaction> {
         }
 
         Transaction transaction = getItem(position);
+        offlineMode = view.findViewById(R.id.offlineMode);
         TextView nTransakcije = view.findViewById(R.id.titleTransaction);
         TextView iTransakcije = view.findViewById(R.id.iznosTransakcije);
         ImageView ikonaTransakcije = view.findViewById(R.id.ikonaTransakcije);
+        offlineMode.setText(transaction.getOffMode());
         nTransakcije.setText(transaction.getTitle());
         iTransakcije.setText(String.format("%.2f", transaction.getAmount()));
         String tipTransakcije = transaction.getType().toString();
@@ -150,5 +153,10 @@ public class TransactionListAdapter extends ArrayAdapter<Transaction> {
 
     public void delete(Transaction transaction) {
         this.remove(transaction);
+    }
+
+    public void edituj(Transaction stara, Transaction nova) {
+        this.remove(stara);
+        this.add(nova);
     }
 }

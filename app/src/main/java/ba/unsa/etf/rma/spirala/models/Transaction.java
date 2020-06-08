@@ -1,7 +1,6 @@
 package ba.unsa.etf.rma.spirala.models;
 
 
-
 import androidx.annotation.NonNull;
 
 import java.io.Serializable;
@@ -31,6 +30,7 @@ public class Transaction implements Serializable {
         }
     }
 
+    private String offMode = "";
     private int idTransaction;
     private Date date;
     private double amount;
@@ -99,6 +99,14 @@ public class Transaction implements Serializable {
         setEndDate(endDate1);
     }
 
+    public String getOffMode() {
+        return offMode;
+    }
+
+    public void setOffMode(String offMode) {
+        this.offMode = offMode;
+    }
+
     public int getIdTransaction() {
         return idTransaction;
     }
@@ -108,6 +116,7 @@ public class Transaction implements Serializable {
     }
 
     private Date pretvoriUDatum(String date) {
+        if (date == null) return null;
         Date date1 = null;
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
         try {

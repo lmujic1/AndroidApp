@@ -1,8 +1,11 @@
 package ba.unsa.etf.rma.spirala.activities;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -17,7 +20,8 @@ import ba.unsa.etf.rma.spirala.models.Transaction;
 import ba.unsa.etf.rma.spirala.presenters.ITransactionDetailPresenter;
 import ba.unsa.etf.rma.spirala.presenters.TransactionDetailPresenter;
 
-public class TransactionDetail extends AppCompatActivity{
+public class TransactionDetail extends AppCompatActivity {
+    private TextView offMode;
     private TextView titleTransakcije;
     private TextView typeTransakcije;
     private TextView opisTransakcije;
@@ -42,6 +46,7 @@ public class TransactionDetail extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.detalji_transakcije);
 
+        offMode = (TextView) findViewById(R.id.offMode);
         titleTransakcije = (TextView) findViewById(R.id.title);
         typeTransakcije = (TextView) findViewById(R.id.typeOftransaction);
         opisTransakcije = (TextView) findViewById(R.id.itemDescription);
@@ -54,6 +59,10 @@ public class TransactionDetail extends AppCompatActivity{
 
 
         transaction = (Transaction) getIntent().getSerializableExtra("transaction");
+
+
+        offMode.setText(transaction.getOffMode());
+        System.out.println(transaction.getOffMode() + " radi li ovo ? ");
 
         titleTransakcije.setText(transaction.getTitle());
         iznosTransakcije.setText(String.format("%.2f", transaction.getAmount()) + " BAM");
@@ -85,7 +94,7 @@ public class TransactionDetail extends AppCompatActivity{
                     switch (which) {
                         case DialogInterface.BUTTON_POSITIVE:
                             Intent intent = new Intent();
-                            setResult(2,intent);
+                            setResult(2, intent);
                             finish();
                             break;
                         case DialogInterface.BUTTON_NEGATIVE:
@@ -102,5 +111,11 @@ public class TransactionDetail extends AppCompatActivity{
         }
     };
 
+    public boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
 
 }

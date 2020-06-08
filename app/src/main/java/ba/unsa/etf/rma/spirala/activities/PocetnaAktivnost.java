@@ -1,8 +1,12 @@
 package ba.unsa.etf.rma.spirala.activities;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Color;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
@@ -12,6 +16,7 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -28,6 +33,7 @@ import ba.unsa.etf.rma.spirala.adapters.SpinnerAdapter;
 import ba.unsa.etf.rma.spirala.adapters.TransactionListAdapter;
 import ba.unsa.etf.rma.spirala.interactors.AccountInteractor;
 import ba.unsa.etf.rma.spirala.interactors.UpdateAccountInteractor;
+import ba.unsa.etf.rma.spirala.util.TransactionDBOpenHelper;
 import ba.unsa.etf.rma.spirala.views.ITransactionListView;
 import ba.unsa.etf.rma.spirala.models.Account;
 import ba.unsa.etf.rma.spirala.models.Transaction;
@@ -35,6 +41,7 @@ import ba.unsa.etf.rma.spirala.presenters.ITransactionListPresenter;
 import ba.unsa.etf.rma.spirala.presenters.TransactionListPresenter;
 
 public class PocetnaAktivnost extends AppCompatActivity implements ITransactionListView {
+
     public static TextView tVAmount;
     public static TextView tVLimit;
     private Spinner spinnerFilter;
@@ -49,6 +56,13 @@ public class PocetnaAktivnost extends AppCompatActivity implements ITransactionL
     private static SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM, yyyy");
     public static Handler handler = new Handler();
 
+
+    TransactionDBOpenHelper transactionDBOpenHelper;
+    ArrayList<Transaction> getTransactionFromDatabase = new ArrayList<>();
+    private boolean firstTimeOpen = true;
+    private ArrayList<Transaction> offlineBrisanje = new ArrayList<>(),
+            offlineDodavanje = new ArrayList<>(),
+            offlineEditovanje = new ArrayList<>();
 
     public ITransactionListPresenter getPresenter() {
         if (trasactionListPresenter == null) {
@@ -66,11 +80,22 @@ public class PocetnaAktivnost extends AppCompatActivity implements ITransactionL
 
     public static Account account;
 
-    private OnItemClick onItemClick;
 
 
-    public interface OnItemClick {
-        public void onItemClicked(Transaction transaction);
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (isNetworkAvailable()) {
+            getPresenter().getTransactionOnDate(defaultDate);
+            for (Transaction t : offlineDodavanje) {
+                getPresenter().addTransaction(t);
+            }
+            for (Transaction t : offlineBrisanje) {
+                getPresenter().deleteTransaction(t);
+            }
+            getPresenter().getTransactionOnDate(defaultDate);
+
+        }
     }
 
     @SuppressLint("SetTextI18n")
@@ -78,7 +103,6 @@ public class PocetnaAktivnost extends AppCompatActivity implements ITransactionL
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.pocetna);
-
 
         transactionListAdapter = new TransactionListAdapter(this, R.layout.lista_transakcija, listaTransakcija);
         filtrirajAdapter = new FiltrirajAdapter(this);
@@ -103,18 +127,26 @@ public class PocetnaAktivnost extends AppCompatActivity implements ITransactionL
         spinnerFilter.setOnItemSelectedListener(filterItemClickListener);
         spinnerSort.setOnItemSelectedListener(sortItemClickListener);
 
+
         lVTransakcije.setAdapter(transactionListAdapter);
         lVTransakcije.setOnItemClickListener(listaTransakcijaCLickListener);
         lVTransakcije.setOnItemLongClickListener(editTransactionClickListener);
 
-        getPresenter().getTransactionOnDate(defaultDate);
 
         prevMonth.setOnClickListener(prevMonthOnClickListener);
         nextMonth.setOnClickListener(nextMonthClickListener);
 
         dodajTransakciju.setOnClickListener(addTransactionOnClickListener);
 
-        getInfoAboutAccount();
+        getPresenter().getTransactionCursor();
+
+    }
+
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
     private void getInfoAboutAccount() {
@@ -170,7 +202,6 @@ public class PocetnaAktivnost extends AppCompatActivity implements ITransactionL
             tDefaultDate.setText(dateFormat.format(defaultDate));
             getPresenter().getTransactionOnDate(defaultDate);
 
-
         }
     };
 
@@ -189,7 +220,9 @@ public class PocetnaAktivnost extends AppCompatActivity implements ITransactionL
         @Override
         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
             String selectedItemText = (String) parent.getItemAtPosition(position);
-            getPresenter().getSortTransaction(selectedItemText);
+            if (isNetworkAvailable()) {
+                getPresenter().getSortTransaction(selectedItemText);
+            }
         }
 
         @Override
@@ -204,9 +237,13 @@ public class PocetnaAktivnost extends AppCompatActivity implements ITransactionL
         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
             String selectedItemText = (String) parent.getItemAtPosition(position);
             if (selectedItemText.equals("All transactions") || selectedItemText.equals("Filter by")) {
-                getPresenter().getTransactionOnDate(defaultDate);
+                if (isNetworkAvailable()) {
+                    getPresenter().getTransactionOnDate(defaultDate);
+                }
             } else {
-                getPresenter().getFilteredTransacion(selectedItemText);
+                if (isNetworkAvailable()) {
+                    getPresenter().getFilteredTransacion(selectedItemText);
+                }
             }
         }
 
@@ -216,67 +253,6 @@ public class PocetnaAktivnost extends AppCompatActivity implements ITransactionL
         }
     };
 
-    private AdapterView.OnItemClickListener listItemClickListener = new AdapterView.OnItemClickListener() {
-        @Override
-        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            for (int i = 0; i < lVTransakcije.getChildCount(); i++) {
-                if (i == position)
-                    lVTransakcije.getChildAt(i).setBackgroundColor(Color.GRAY);
-                else lVTransakcije.getChildAt(i).setBackgroundColor(Color.WHITE);
-            }
-            Transaction transaction = transactionListAdapter.getTransaction(position);
-            onItemClick.onItemClicked(transaction);
-        }
-    };
-
-    @Override
-    public void setTransactions(ArrayList<Transaction> transactions) {
-        transactionListAdapter.setTransactions(transactions);
-    }
-
-    @Override
-    public void notifyTransactionListDataSetChanged() {
-        transactionListAdapter.notifyDataSetChanged();
-    }
-
-    @Override
-    public void clearListOfTransactions() {
-        transactionListAdapter.clearList();
-    }
-
-    @Override
-    public void sort(String string) {
-        transactionListAdapter.sortiraj(string);
-    }
-
-    @Override
-    public void removeTransaction(Transaction transaction) {
-        transactionListAdapter.delete(transaction);
-    }
-
-    @Override
-    public void addTransaction(Transaction trans) {
-        transactionListAdapter.dodajTransakciju(trans);
-    }
-
-    private Date getDatum(String text) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM, yyyy");
-        Date datum = null;
-        try {
-            datum = dateFormat.parse(text);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        return datum;
-    }
-
-    private Date izracunajMjesec(Date dat, int i) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(dat);
-        calendar.add(Calendar.MONTH, i);
-        return calendar.getTime();
-    }
-
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -284,10 +260,18 @@ public class PocetnaAktivnost extends AppCompatActivity implements ITransactionL
 
         if (resultCode == 2) {
             if (data != null) {
-                getPresenter().deleteTransaction(izabranaTransakcija);
-                getPresenter().getTransactionOnDate(defaultDate);
-                editAccount(izabranaTransakcija, 2);
-                getInfoAboutAccount();
+                if (isNetworkAvailable()) {
+                    getPresenter().deleteTransaction(izabranaTransakcija);
+                    getPresenter().getTransactionOnDate(defaultDate);
+                    editAccount(izabranaTransakcija, 2);
+                    getInfoAboutAccount();
+                } else {
+                    Toast.makeText(getApplicationContext(), "Offline brisanje", Toast.LENGTH_SHORT).show();
+                    offlineBrisanje.add(izabranaTransakcija);
+                    izabranaTransakcija.setOffMode("Offline brisanje");
+                    getPresenter().deleteTransactionDB(izabranaTransakcija);
+
+                }
             }
         } else if (requestCode == 3) {
             if (data != null
@@ -325,10 +309,18 @@ public class PocetnaAktivnost extends AppCompatActivity implements ITransactionL
                 nova.setDate(date);
                 nova.setEndDate(endDate);
 
-                getPresenter().addTransaction(nova);
-                getPresenter().getTransactionOnDate(defaultDate);
-                editAccount(nova, 3);
-                getInfoAboutAccount();
+                if (isNetworkAvailable()) {
+                    getPresenter().addTransaction(nova);
+                    getPresenter().getTransactionOnDate(defaultDate);
+                    editAccount(nova, 3);
+                    getInfoAboutAccount();
+                } else {
+                    Toast.makeText(getApplicationContext(), "Offline dodavanje", Toast.LENGTH_SHORT).show();
+                    nova.setOffMode("Offline dodavanje");
+
+                    offlineDodavanje.add(nova);
+                    getPresenter().addedTransactionDB(nova);
+                }
             }
         } else if (resultCode == 4) {
             if (data != null
@@ -358,6 +350,7 @@ public class PocetnaAktivnost extends AppCompatActivity implements ITransactionL
                 amount = data.getDoubleExtra("amount", 0);
                 type = (Transaction.Type) data.getSerializableExtra("type");
 
+                nova.setIdTransaction(izabranaTransakcija.getIdTransaction());
                 nova.setType(type);
                 nova.setTitle(title);
                 nova.setItemDescription(description);
@@ -366,12 +359,74 @@ public class PocetnaAktivnost extends AppCompatActivity implements ITransactionL
                 nova.setDate(date);
                 nova.setEndDate(endDate);
 
-                getPresenter().editTransaction(nova, izabranaTransakcija);
-                getPresenter().getTransactionOnDate(defaultDate);
-                editAccount(nova, izabranaTransakcija, 3);
-                getInfoAboutAccount();
+                if (isNetworkAvailable()) {
+                    getPresenter().editTransaction(nova, izabranaTransakcija);
+                    getPresenter().getTransactionOnDate(defaultDate);
+                    editAccount(nova, izabranaTransakcija, 3);
+                    getInfoAboutAccount();
+                } else {
+                    Toast.makeText(getApplicationContext(), "Offline izmjena", Toast.LENGTH_SHORT).show();
+                    izabranaTransakcija.setOffMode("Offline izmjena");
+                    nova.setOffMode("Offline izmjena");
+                    getPresenter().editTransactionDB(izabranaTransakcija, nova);
+                    offlineEditovanje.add(nova);
+                }
             }
         }
+    }
+
+    @Override
+    public void setTransactions(ArrayList<Transaction> transactions) {
+        transactionListAdapter.setTransactions(transactions);
+    }
+
+    @Override
+    public void notifyTransactionListDataSetChanged() {
+        transactionListAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void clearListOfTransactions() {
+        transactionListAdapter.clearList();
+    }
+
+    @Override
+    public void sort(String string) {
+        transactionListAdapter.sortiraj(string);
+    }
+
+    @Override
+    public void removeTransaction(Transaction transaction) {
+        transactionListAdapter.delete(transaction);
+    }
+
+    @Override
+    public void addTransaction(Transaction trans) {
+        transactionListAdapter.dodajTransakciju(trans);
+    }
+
+    @Override
+    public void editingTransaction(Transaction stara, Transaction nova) {
+        transactionListAdapter.edituj(stara,nova);
+    }
+
+
+    private Date getDatum(String text) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM, yyyy");
+        Date datum = null;
+        try {
+            datum = dateFormat.parse(text);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return datum;
+    }
+
+    private Date izracunajMjesec(Date dat, int i) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(dat);
+        calendar.add(Calendar.MONTH, i);
+        return calendar.getTime();
     }
 
     private void editAccount(Transaction nova, Transaction izabranaTransakcija, int vrsta) {
@@ -411,6 +466,5 @@ public class PocetnaAktivnost extends AppCompatActivity implements ITransactionL
         query += "\"budget\" : " + newBudget + "\n}";
         new UpdateAccountInteractor().execute(query);
     }
-
 
 }

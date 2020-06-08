@@ -86,10 +86,10 @@ public class AccountInteractor extends AsyncTask<String, Integer, Void> {
         PocetnaAktivnost.handler.post(new Runnable() {
             @Override
             public void run() {
-                String budget = String.valueOf(account.getBudget());
+              /*  String budget = String.valueOf(account.getBudget());
                 String mlimit = String.valueOf(account.getMonthLimit());
                 PocetnaAktivnost.tVAmount.setText("Budget: " + budget);
-                PocetnaAktivnost.tVLimit.setText("Month limit: " + mlimit);
+                PocetnaAktivnost.tVLimit.setText("Month limit: " + mlimit);*/
             }
         });
     }

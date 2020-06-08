@@ -1,31 +1,33 @@
 package ba.unsa.etf.rma.spirala.presenters;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.text.format.DateFormat;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
+import ba.unsa.etf.rma.spirala.adapters.TransactionListAdapter;
 import ba.unsa.etf.rma.spirala.interactors.AccountInteractor;
 import ba.unsa.etf.rma.spirala.interactors.TransactionDeleteInteractor;
 import ba.unsa.etf.rma.spirala.interactors.TransactionAddInteractor;
 import ba.unsa.etf.rma.spirala.interactors.TransactionEditInteractor;
+import ba.unsa.etf.rma.spirala.interactors.TransactionListInteractor;
 import ba.unsa.etf.rma.spirala.views.ITransactionListView;
 import ba.unsa.etf.rma.spirala.activities.PocetnaAktivnost;
-import ba.unsa.etf.rma.spirala.interactors.TransactionListInteractor;
 import ba.unsa.etf.rma.spirala.models.Transaction;
 
 public class TransactionListPresenter implements ITransactionListPresenter, TransactionListInteractor.OnTransactionGetDone {
 
     private ITransactionListView view;
     private Context context;
+    private TransactionListInteractor transactionListInteractor = new TransactionListInteractor();
 
     public TransactionListPresenter(ITransactionListView view, Context context) {
         this.view = view;
         this.context = context;
     }
-
 
     @Override
     public void getTransactions(String query) {
@@ -105,7 +107,6 @@ public class TransactionListPresenter implements ITransactionListPresenter, Tran
         new TransactionListInteractor((TransactionListInteractor.OnTransactionGetDone) this).execute(query);
 
     }
-
 
     @Override
     public void addTransaction(Transaction nova) {
@@ -197,8 +198,36 @@ public class TransactionListPresenter implements ITransactionListPresenter, Tran
         }
     }
 
+    @Override
+    public void transactionFromDB(ArrayList<Transaction> getTransactionFromDatabase) {
+        view.clearListOfTransactions();
+        view.setTransactions(getTransactionFromDatabase);
+        view.notifyTransactionListDataSetChanged();
+    }
 
+    @Override
+    public void addedTransactionDB(Transaction nova) {
+        transactionListInteractor.saveTransaction(nova,context);
+        System.out.println(nova.getOffMode() + " DA  LI OVDJE RADI ? ");
+        view.addTransaction(nova);
+        view.notifyTransactionListDataSetChanged();
+    }
 
+    @Override
+    public void deleteTransactionDB(Transaction izabranaTransakcija) {
+        transactionListInteractor.deleteTransaction(context,izabranaTransakcija.getIdTransaction());
+        TransactionListAdapter.offlineMode.setText(izabranaTransakcija.getOffMode());
+       /* view.removeTransaction(izabranaTransakcija);
+        view.notifyTransactionListDataSetChanged();*/
+    }
+
+    @Override
+    public void editTransactionDB(Transaction stara, Transaction nova) {
+        System.out.println(nova.getOffMode() + " DA  LI OVDJE RADI ? ");
+        transactionListInteractor.editTransaction(context,nova);
+        view.editingTransaction(stara,nova);
+        view.notifyTransactionListDataSetChanged();
+    }
 
     @Override
     public void onGetDone(ArrayList<Transaction> results) {
@@ -206,4 +235,15 @@ public class TransactionListPresenter implements ITransactionListPresenter, Tran
         view.setTransactions(results);
         view.notifyTransactionListDataSetChanged();
     }
+
+    @Override
+    public void getTransactionCursor() {
+        view.clearListOfTransactions();
+        view.setTransactions(transactionListInteractor.getTransactionCursor(context));
+        view.notifyTransactionListDataSetChanged();
+    }
+
+
+
+
 }

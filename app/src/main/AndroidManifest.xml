@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="ba.unsa.etf.rma.spirala">
 
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
 
@@ -26,9 +27,12 @@
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
                 <category android:name="android.intent.category.DEFAULT" />
-                <data android:mimeType="text/plain" />
+                <data android:mimeType="text/*" />
             </intent-filter>
         </activity>
+        <provider
+            android:authorities="rma.provider.transactions"
+            android:name=".util.TransactionContentProvider"/>
     </application>
 
 </manifest>
