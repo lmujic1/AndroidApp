@@ -32,14 +32,6 @@ public class TransactionDetail extends AppCompatActivity {
     private Button saveButton;
     private Button deleteButton;
 
-    private ITransactionDetailPresenter presenter;
-
-    public ITransactionDetailPresenter getPresenterDetail() {
-        if (presenter == null) {
-            presenter = new TransactionDetailPresenter(this);
-        }
-        return presenter;
-    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -111,11 +103,5 @@ public class TransactionDetail extends AppCompatActivity {
         }
     };
 
-    public boolean isNetworkAvailable() {
-        ConnectivityManager connectivityManager
-                = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
-    }
 
 }

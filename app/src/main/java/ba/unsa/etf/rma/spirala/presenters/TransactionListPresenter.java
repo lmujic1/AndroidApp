@@ -246,7 +246,13 @@ public class TransactionListPresenter implements ITransactionListPresenter, Tran
         view.notifyTransactionListDataSetChanged();
     }
 
-
+    @Override
+    public void deleteTransactionOff(Transaction t) {
+        String query = "/" + t.getIdTransaction();
+        Intent intent = new Intent(Intent.ACTION_SYNC, null, context, TransactionDeleteInteractor.class);
+        intent.putExtra("query", query);
+        context.getApplicationContext().startService(intent);
+    }
 
 
 }

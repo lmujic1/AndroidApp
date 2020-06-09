@@ -468,7 +468,7 @@ public class PocetnaAktivnost extends AppCompatActivity implements ITransactionL
         }
         offlineEditovanje.clear();
         for (Transaction t : offlineBrisanje) {
-            getPresenter().deleteTransaction(t);
+            getPresenter().deleteTransactionOff(t);
         }
         offlineBrisanje.clear();
 
