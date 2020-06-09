@@ -1,7 +1,11 @@
 package ba.unsa.etf.rma.spirala.interactors;
 
+import android.app.IntentService;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.util.Log;
+
+import androidx.annotation.Nullable;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -13,18 +17,19 @@ import java.net.ProtocolException;
 import java.net.URL;
 
 
-public class TransactionDeleteInteractor extends AsyncTask<String, Integer, Void> {
+public class TransactionDeleteInteractor extends IntentService {
     private String mainURL = "http://rma20-app-rmaws.apps.us-west-1.starter.openshift-online.com/account/";
     private String api_id = "7a4c053e-81fb-42ec-847b-b356864911dc";
 
 
     public TransactionDeleteInteractor() {
+        super(null);
     }
 
     @Override
-    protected Void doInBackground(String... strings) {
-        String forDelete = strings[0];
-        String url1 = mainURL + api_id + "/transactions"+ forDelete;
+    protected void onHandleIntent(@Nullable Intent intent) {
+        String forDelete = intent.getStringExtra("query");//strings[0];
+        String url1 = mainURL + api_id + "/transactions" + forDelete;
         String forAdd = "";
         try {
             URL url = new URL(url1);
@@ -40,19 +45,13 @@ public class TransactionDeleteInteractor extends AsyncTask<String, Integer, Void
                 os.write(input, 0, input.length);
             }
 
-            //int responseCode=postConnection.getResponseCode();
-            //System.out.println("RESPONSE CODE " + responseCode);
-            //InputStream in = postConnection.getInputStream();
             try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(postConnection.getInputStream(), "utf-8"))) {
-
                 StringBuilder response = new StringBuilder();
                 String inputLine = null;
                 while ((inputLine = bufferedReader.readLine()) != null) {
                     response.append(inputLine.trim());
                 }
-
                 Log.d("RESPONSE", response.toString());
-                //System.out.println("Transakcija je dodana");
             }
         } catch (MalformedURLException e) {
             e.printStackTrace();
@@ -62,12 +61,5 @@ public class TransactionDeleteInteractor extends AsyncTask<String, Integer, Void
             e.printStackTrace();
         }
 
-        return null;
     }
-
-    @Override
-    protected void onPostExecute(Void aVoid) {
-        super.onPostExecute(aVoid);
-    }
-
 }

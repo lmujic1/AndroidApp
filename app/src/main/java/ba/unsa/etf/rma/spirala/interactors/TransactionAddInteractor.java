@@ -1,7 +1,11 @@
 package ba.unsa.etf.rma.spirala.interactors;
 
+import android.app.IntentService;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.util.Log;
+
+import androidx.annotation.Nullable;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -14,20 +18,28 @@ import java.net.URL;
 
 import ba.unsa.etf.rma.spirala.models.Transaction;
 
-public class TransactionAddInteractor extends AsyncTask<String, Integer, Void> {
+public class TransactionAddInteractor extends IntentService {
     private String mainURL = "http://rma20-app-rmaws.apps.us-west-1.starter.openshift-online.com/account/";
     private String api_id = "7a4c053e-81fb-42ec-847b-b356864911dc";
     private Transaction transaction;
 
+    public TransactionAddInteractor(String name) {
+        super(name);
+    }
+
+    public TransactionAddInteractor() {
+        super(null);
+    }
 
     public TransactionAddInteractor(Transaction transaction) {
+        super(null);
         this.transaction = transaction;
     }
 
     @Override
-    protected Void doInBackground(String... strings) {
+    protected void onHandleIntent(@Nullable Intent intent) {
         String url1 = mainURL + api_id + "/transactions";
-        String forAdd = strings[0];
+        String forAdd = intent.getStringExtra("query");
         try {
             URL url = new URL(url1);
             HttpURLConnection postConnection = (HttpURLConnection) url.openConnection();
@@ -60,12 +72,5 @@ public class TransactionAddInteractor extends AsyncTask<String, Integer, Void> {
             e.printStackTrace();
         }
 
-        return null;
     }
-
-    @Override
-    protected void onPostExecute(Void aVoid) {
-        super.onPostExecute(aVoid);
-    }
-
 }

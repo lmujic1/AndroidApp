@@ -1,12 +1,16 @@
 package ba.unsa.etf.rma.spirala.interactors;
 
+import android.app.IntentService;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
+
+import androidx.annotation.Nullable;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -26,15 +30,54 @@ import ba.unsa.etf.rma.spirala.models.Account;
 import ba.unsa.etf.rma.spirala.util.TransactionDBOpenHelper;
 
 
-public class AccountInteractor extends AsyncTask<String, Integer, Void> implements IAccountInteractor {
+public class AccountInteractor extends IntentService implements IAccountInteractor {
     private String mainURL = "http://rma20-app-rmaws.apps.us-west-1.starter.openshift-online.com/account/";
     private String api_id = "7a4c053e-81fb-42ec-847b-b356864911dc";
     private Account account;
 
 
     public AccountInteractor() {
+         super(null);
     }
 
+    @Override
+    protected void onHandleIntent(@Nullable Intent intent) {
+        URL url = null;
+        String url1 = mainURL + api_id;
+        try {
+            url = new URL(url1);
+            HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+            InputStream is = new BufferedInputStream(urlConnection.getInputStream());
+            String result = convertStreamToString(is);
+            JSONObject jsonObject = new JSONObject(result);
+
+            int id = jsonObject.getInt("id");
+            double budget = jsonObject.getDouble("budget");
+            double totalLimit = jsonObject.getDouble("totalLimit");
+            double monthLimit = jsonObject.getDouble("monthLimit");
+
+            account = new Account(id, budget, totalLimit, monthLimit);
+
+            PocetnaAktivnost.account = account;
+
+            PocetnaAktivnost.handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    String budget = String.valueOf(account.getBudget());
+                    String mlimit = String.valueOf(account.getMonthLimit());
+                    PocetnaAktivnost.tVAmount.setText("Budget: " + budget);
+                    PocetnaAktivnost.tVLimit.setText("Month limit: " + mlimit);
+                }
+            });
+
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
     public String convertStreamToString(InputStream is) {
         BufferedReader reader = new BufferedReader(new InputStreamReader(is));
         StringBuilder sb = new StringBuilder();
@@ -57,53 +100,6 @@ public class AccountInteractor extends AsyncTask<String, Integer, Void> implemen
     }
 
     @Override
-    protected Void doInBackground(String... strings) {
-        URL url = null;
-        String url1 = mainURL + api_id;
-        //System.out.println(url1 + " u accountI");
-        try {
-            url = new URL(url1);
-            HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-            InputStream is = new BufferedInputStream(urlConnection.getInputStream());
-            String result = convertStreamToString(is);
-            JSONObject jsonObject = new JSONObject(result);
-
-            int id = jsonObject.getInt("id");
-            double budget = jsonObject.getDouble("budget");
-            double totalLimit = jsonObject.getDouble("totalLimit");
-            double monthLimit = jsonObject.getDouble("monthLimit");
-
-            account = new Account(id, budget, totalLimit, monthLimit);
-            PocetnaAktivnost.account = account;
-
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    @Override
-    protected void onPostExecute(Void aVoid) {
-        super.onPostExecute(aVoid);
-        PocetnaAktivnost.account = account;
-        PocetnaAktivnost.handler.post(new Runnable() {
-            @Override
-            public void run() {
-                String budget = String.valueOf(account.getBudget());
-                String mlimit = String.valueOf(account.getMonthLimit());
-                PocetnaAktivnost.tVAmount.setText("Budget: " + budget);
-                PocetnaAktivnost.tVLimit.setText("Month limit: " + mlimit);
-                PocetnaAktivnost.editAccountAfterOfflineMode();
-            }
-        });
-    }
-
-
-    @Override
     public Account getAccountDetail(Context context) {
         Account account = null;
         ContentResolver contentResolver = context.getApplicationContext().getContentResolver();
@@ -119,7 +115,6 @@ public class AccountInteractor extends AsyncTask<String, Integer, Void> implemen
             double budget = cursor.getDouble(cursor.getColumnIndexOrThrow(TransactionDBOpenHelper.ACCOUNT_BUDGET));
             double monthLimit = cursor.getDouble(cursor.getColumnIndexOrThrow(TransactionDBOpenHelper.ACCOUNT_MONTH_LIMIT));
             double totalLimit = cursor.getDouble(cursor.getColumnIndexOrThrow(TransactionDBOpenHelper.ACCOUNT_TOTAL_LIMIT));
-            System.out.println(budget + " zasto ne radi ");
             account = new Account(0, budget, totalLimit, monthLimit);
         }
         return account;
@@ -143,11 +138,12 @@ public class AccountInteractor extends AsyncTask<String, Integer, Void> implemen
         ContentResolver contentResolver = context.getApplicationContext().getContentResolver();
         Uri adresa = Uri.parse("content://rma.provider.accounts/elements/#");
         ContentValues contentValues = new ContentValues();
-        System.out.println("da li radi dodavanje");
         contentValues.put(TransactionDBOpenHelper.ACCOUNT_ID, 0);
         contentValues.put(TransactionDBOpenHelper.ACCOUNT_BUDGET, budget);
         contentValues.put(TransactionDBOpenHelper.ACCOUNT_MONTH_LIMIT, monthLimit);
         contentValues.put(TransactionDBOpenHelper.ACCOUNT_TOTAL_LIMIT, totalLimit);
         contentResolver.insert(adresa, contentValues);
     }
+
+
 }

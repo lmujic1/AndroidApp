@@ -37,6 +37,11 @@
             </intent-filter>
         </receiver>
 
+        <service android:name=".interactors.AccountInteractor" />
+        <service android:name=".interactors.UpdateAccountInteractor" />
+        <service android:name=".interactors.TransactionAddInteractor"/>
+        <service android:name=".interactors.TransactionDeleteInteractor"/>
+
         <provider
             android:name=".util.TransactionContentProvider"
             android:authorities="rma.provider.transactions" />
