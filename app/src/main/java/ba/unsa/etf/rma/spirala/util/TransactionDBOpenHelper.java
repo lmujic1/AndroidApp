@@ -67,11 +67,11 @@ public class TransactionDBOpenHelper extends SQLiteOpenHelper {
     public static final String ACCOUNT_TABLE_CREATE =
             "CREATE TABLE IF NOT EXISTS " + ACCOUNT_TABLE
                     + " ("
-                    + ACCOUNT_INTERNAL_ID + "INTEGER PRIMARY KEY AUTOINCREMENT, "
+                    + ACCOUNT_INTERNAL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
                     + ACCOUNT_ID + " INTEGER UNIQUE,"
-                    + ACCOUNT_BUDGET + " REAL NOT NULL,"
-                    + ACCOUNT_MONTH_LIMIT + " REAL NOT NULL,"
-                    + ACCOUNT_TOTAL_LIMIT + " REAL NOT NULL);";
+                    + ACCOUNT_BUDGET + " REAL,"
+                    + ACCOUNT_MONTH_LIMIT + " REAL,"
+                    + ACCOUNT_TOTAL_LIMIT + " REAL);";
 
     public static final String ACCOUNT_DROP = "DROP TABLE IF EXISTS " + ACCOUNT_TABLE;
 

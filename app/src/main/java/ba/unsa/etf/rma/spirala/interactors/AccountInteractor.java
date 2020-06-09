@@ -1,8 +1,10 @@
 package ba.unsa.etf.rma.spirala.interactors;
 
 import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 
@@ -91,10 +93,11 @@ public class AccountInteractor extends AsyncTask<String, Integer, Void> implemen
         PocetnaAktivnost.handler.post(new Runnable() {
             @Override
             public void run() {
-              /*  String budget = String.valueOf(account.getBudget());
+                String budget = String.valueOf(account.getBudget());
                 String mlimit = String.valueOf(account.getMonthLimit());
                 PocetnaAktivnost.tVAmount.setText("Budget: " + budget);
-                PocetnaAktivnost.tVLimit.setText("Month limit: " + mlimit);*/
+                PocetnaAktivnost.tVLimit.setText("Month limit: " + mlimit);
+                PocetnaAktivnost.editAccountAfterOfflineMode();
             }
         });
     }
@@ -102,7 +105,24 @@ public class AccountInteractor extends AsyncTask<String, Integer, Void> implemen
 
     @Override
     public Account getAccountDetail(Context context) {
-        return null;
+        Account account = null;
+        ContentResolver contentResolver = context.getApplicationContext().getContentResolver();
+        String[] kolone = null;
+        Uri adresa = Uri.parse("content://rma.provider.accounts/elements/#");
+        String where = TransactionDBOpenHelper.ACCOUNT_ID + "=" + 0;
+        String[] whereArgs = null;
+        String order = null;
+        Cursor cursor = contentResolver.query(adresa, kolone, where, whereArgs, order);
+        if (cursor != null) {
+            cursor.moveToFirst();
+            //int accountid = cursor.getInt(cursor.getColumnIndexOrThrow(TransactionDBOpenHelper.ACCOUNT_ID));
+            double budget = cursor.getDouble(cursor.getColumnIndexOrThrow(TransactionDBOpenHelper.ACCOUNT_BUDGET));
+            double monthLimit = cursor.getDouble(cursor.getColumnIndexOrThrow(TransactionDBOpenHelper.ACCOUNT_MONTH_LIMIT));
+            double totalLimit = cursor.getDouble(cursor.getColumnIndexOrThrow(TransactionDBOpenHelper.ACCOUNT_TOTAL_LIMIT));
+            System.out.println(budget + " zasto ne radi ");
+            account = new Account(0, budget, totalLimit, monthLimit);
+        }
+        return account;
     }
 
     @Override
@@ -115,15 +135,16 @@ public class AccountInteractor extends AsyncTask<String, Integer, Void> implemen
         contentValues.put(TransactionDBOpenHelper.ACCOUNT_TOTAL_LIMIT, totalLimit);
         String where = TransactionDBOpenHelper.ACCOUNT_ID + "=" + TransactionDBOpenHelper.accountID;
         String[] whereArgs = null;
-        contentResolver.update(adresa,contentValues,where,whereArgs);
+        contentResolver.update(adresa, contentValues, where, whereArgs);
     }
 
     @Override
     public void insertDetailAccount(Context context, double budget, double monthLimit, double totalLimit) {
         ContentResolver contentResolver = context.getApplicationContext().getContentResolver();
-        Uri adresa = Uri.parse("content://rma.provider.accounts/elements");
+        Uri adresa = Uri.parse("content://rma.provider.accounts/elements/#");
         ContentValues contentValues = new ContentValues();
-        contentValues.put(TransactionDBOpenHelper.ACCOUNT_ID, TransactionDBOpenHelper.accountID);
+        System.out.println("da li radi dodavanje");
+        contentValues.put(TransactionDBOpenHelper.ACCOUNT_ID, 0);
         contentValues.put(TransactionDBOpenHelper.ACCOUNT_BUDGET, budget);
         contentValues.put(TransactionDBOpenHelper.ACCOUNT_MONTH_LIMIT, monthLimit);
         contentValues.put(TransactionDBOpenHelper.ACCOUNT_TOTAL_LIMIT, totalLimit);

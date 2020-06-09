@@ -57,7 +57,7 @@ public class AccountContentProvider extends ContentProvider {
     public String getType(@NonNull Uri uri) {
         switch (um.match(uri)) {
             case ACCOUNTID:
-                return "vnd.android.cursor.item/vnd.rma.elemental";
+                return "vnd.android.cursor.dir/vnd.rma.elemental";
             default:
                 throw new IllegalArgumentException("Unsuported uri: " + uri.toString());
         }

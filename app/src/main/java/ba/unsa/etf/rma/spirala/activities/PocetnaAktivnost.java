@@ -3,6 +3,7 @@ package ba.unsa.etf.rma.spirala.activities;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
@@ -33,6 +34,7 @@ import ba.unsa.etf.rma.spirala.adapters.SpinnerAdapter;
 import ba.unsa.etf.rma.spirala.adapters.TransactionListAdapter;
 import ba.unsa.etf.rma.spirala.interactors.AccountInteractor;
 import ba.unsa.etf.rma.spirala.interactors.UpdateAccountInteractor;
+import ba.unsa.etf.rma.spirala.util.ConnectivityBroadcastReceiver;
 import ba.unsa.etf.rma.spirala.util.TransactionDBOpenHelper;
 import ba.unsa.etf.rma.spirala.views.ITransactionListView;
 import ba.unsa.etf.rma.spirala.models.Account;
@@ -57,12 +59,11 @@ public class PocetnaAktivnost extends AppCompatActivity implements ITransactionL
     public static Handler handler = new Handler();
 
 
-    TransactionDBOpenHelper transactionDBOpenHelper;
-    ArrayList<Transaction> getTransactionFromDatabase = new ArrayList<>();
-    private boolean firstTimeOpen = true;
     private ArrayList<Transaction> offlineBrisanje = new ArrayList<>(),
             offlineDodavanje = new ArrayList<>(),
             offlineEditovanje = new ArrayList<>();
+    private ConnectivityBroadcastReceiver connectivityBroadcastReceiver = new ConnectivityBroadcastReceiver();
+    private IntentFilter filter = new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE");
 
     public ITransactionListPresenter getPresenter() {
         if (trasactionListPresenter == null) {
@@ -79,12 +80,14 @@ public class PocetnaAktivnost extends AppCompatActivity implements ITransactionL
     private Transaction izabranaTransakcija;
 
     public static Account account;
+    private static Account offlineAccount = new Account();
 
-
+    private Boolean firstTimeOpen = true;
 
     @Override
     protected void onResume() {
         super.onResume();
+        registerReceiver(connectivityBroadcastReceiver, filter);
         if (isNetworkAvailable()) {
             getPresenter().getTransactionOnDate(defaultDate);
             for (Transaction t : offlineDodavanje) {
@@ -96,8 +99,27 @@ public class PocetnaAktivnost extends AppCompatActivity implements ITransactionL
             }
             offlineBrisanje.clear();
             getPresenter().getTransactionOnDate(defaultDate);
+            getInfoAboutAccount();
 
+            //editAccountAfterOfflineMode();
+            //getInfoAboutAccount();
+        } else if(!isNetworkAvailable()) {
+            getAccountFromDB();
         }
+    }
+
+    public static void editAccountAfterOfflineMode() {
+
+        String query = "{\n";
+        double newBudget = account.getBudget() + offlineAccount.getBudget();
+        query += "\"budget\" : " + newBudget + "\n}";
+        new UpdateAccountInteractor().execute(query);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterReceiver(connectivityBroadcastReceiver);
     }
 
     @SuppressLint("SetTextI18n")
@@ -140,8 +162,25 @@ public class PocetnaAktivnost extends AppCompatActivity implements ITransactionL
 
         dodajTransakciju.setOnClickListener(addTransactionOnClickListener);
 
-        getPresenter().getTransactionCursor();
+        if (!isNetworkAvailable()) {
+            getAccountFromDB();
 
+            getPresenter().getTransactionCursor();
+            if (firstTimeOpen) {
+                firstTimeOpen = false;
+                insertAccount();
+            }
+
+            System.out.println(offlineAccount.getBudget());
+        } else if(isNetworkAvailable()) {
+            getPresenter().getTransactionOnDate(defaultDate);
+            getInfoAboutAccount();
+        }
+
+    }
+
+    private void insertAccount() {
+        accountInteractor.insertDetailAccount(this, 0, 0, 0);
     }
 
     private boolean isNetworkAvailable() {
@@ -149,10 +188,6 @@ public class PocetnaAktivnost extends AppCompatActivity implements ITransactionL
                 = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
-    }
-
-    private void getInfoAboutAccount() {
-        new AccountInteractor().execute();
     }
 
 
@@ -266,14 +301,21 @@ public class PocetnaAktivnost extends AppCompatActivity implements ITransactionL
                     getPresenter().deleteTransaction(izabranaTransakcija);
                     getPresenter().getTransactionOnDate(defaultDate);
                     getPresenter().deleteTransactionDB(izabranaTransakcija);
-                    //editAccount(izabranaTransakcija, 2);
-                    //getInfoAboutAccount();
+                    editAccount(izabranaTransakcija, 2);
+                    getInfoAboutAccount();
                 } else {
                     Toast.makeText(getApplicationContext(), "Offline brisanje", Toast.LENGTH_SHORT).show();
                     offlineBrisanje.add(izabranaTransakcija);
                     izabranaTransakcija.setOffMode("Offline brisanje");
                     getPresenter().deleteTransactionDB(izabranaTransakcija);
-
+                    Transaction.Type tip = izabranaTransakcija.getType();
+                    int type = izabranaTransakcija.getTypeId(tip);
+                    double newBudget = offlineAccount.getBudget();
+                    if (type == 2 || type == 4) {
+                        newBudget -= izabranaTransakcija.getAmount();
+                    } else newBudget += izabranaTransakcija.getAmount();
+                    accountInteractor.editAccount(this, newBudget, offlineAccount.getMonthLimit(), offlineAccount.getTotalLimit());
+                    getAccountFromDB();
                 }
             }
         } else if (requestCode == 3) {
@@ -315,14 +357,22 @@ public class PocetnaAktivnost extends AppCompatActivity implements ITransactionL
                 if (isNetworkAvailable()) {
                     getPresenter().addTransaction(nova);
                     getPresenter().getTransactionOnDate(defaultDate);
-                    //editAccount(nova, 3);
-                    //getInfoAboutAccount();
+                    editAccount(nova, 3);
+                    getInfoAboutAccount();
                 } else {
                     Toast.makeText(getApplicationContext(), "Offline dodavanje", Toast.LENGTH_SHORT).show();
                     nova.setOffMode("Offline dodavanje");
 
                     offlineDodavanje.add(nova);
                     getPresenter().addedTransactionDB(nova);
+                    Transaction.Type tip = nova.getType();
+                    int typei = nova.getTypeId(tip);
+                    double newBudget = offlineAccount.getBudget();
+                    if (typei == 2 || typei == 4) {
+                        newBudget += nova.getAmount();
+                    } else newBudget -= nova.getAmount();
+                    accountInteractor.editAccount(this, newBudget, offlineAccount.getMonthLimit(), offlineAccount.getTotalLimit());
+                    getAccountFromDB();
                 }
             }
         } else if (resultCode == 4) {
@@ -365,13 +415,28 @@ public class PocetnaAktivnost extends AppCompatActivity implements ITransactionL
                 if (isNetworkAvailable()) {
                     getPresenter().editTransaction(nova, izabranaTransakcija);
                     getPresenter().getTransactionOnDate(defaultDate);
-                   // editAccount(nova, izabranaTransakcija, 3);
-                   // getInfoAboutAccount();
+                    editAccount(nova, izabranaTransakcija, 3);
+                    getInfoAboutAccount();
                 } else {
                     Toast.makeText(getApplicationContext(), "Offline izmjena", Toast.LENGTH_SHORT).show();
+
                     izabranaTransakcija.setOffMode("Offline izmjena");
                     nova.setOffMode("Offline izmjena");
                     getPresenter().editTransactionDB(izabranaTransakcija, nova);
+                    Transaction.Type tip = nova.getType();
+                    int typei = nova.getTypeId(tip);
+                    double newBudget = offlineAccount.getBudget();
+                    double oldBudget = izabranaTransakcija.getAmount();
+                    if (typei == 2 || typei == 4) {
+                        newBudget -= oldBudget;
+                        newBudget += nova.getAmount();
+                    } else {
+                        newBudget += oldBudget;
+                        newBudget -= nova.getAmount();
+                    }
+                    accountInteractor.editAccount(this, newBudget, offlineAccount.getMonthLimit(), offlineAccount.getTotalLimit());
+                    getAccountFromDB();
+                    offlineEditovanje.remove(izabranaTransakcija);
                     offlineEditovanje.add(nova);
                 }
             }
@@ -410,7 +475,25 @@ public class PocetnaAktivnost extends AppCompatActivity implements ITransactionL
 
     @Override
     public void editingTransaction(Transaction stara, Transaction nova) {
-        transactionListAdapter.edituj(stara,nova);
+        transactionListAdapter.edituj(stara, nova);
+    }
+
+
+    private void getInfoAboutAccount() {
+        if (!isNetworkAvailable()) {
+            getAccountFromDB();
+        } else {
+            new AccountInteractor().execute();
+        }
+    }
+
+    private AccountInteractor accountInteractor = new AccountInteractor();
+
+    @SuppressLint("SetTextI18n")
+    private void getAccountFromDB() {
+        offlineAccount = accountInteractor.getAccountDetail(this);
+        tVAmount.setText("Budget: " + String.valueOf(offlineAccount.getBudget()));
+        tVLimit.setText("Month limit: " + String.valueOf(offlineAccount.getMonthLimit()));
     }
 
 
