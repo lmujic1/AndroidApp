@@ -23,4 +23,5 @@ public interface ITransactionListPresenter {
 
     void getTransactionCursor();
 
+    void editTransactionAfterClickDelete(Transaction izabranaTransakcija);
 }

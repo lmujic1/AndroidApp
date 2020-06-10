@@ -247,6 +247,11 @@ public class TransactionListPresenter implements ITransactionListPresenter, Tran
         view.notifyTransactionListDataSetChanged();
     }
 
+    @Override
+    public void editTransactionAfterClickDelete(Transaction izabranaTransakcija) {
+        transactionListInteractor.editTransactionACD(context, izabranaTransakcija);
+    }
+
     private void findTransactionForDeleteOff(ArrayList<Transaction> transactions) {
         if (PocetnaAktivnost.offlineBrisanje.size() != 0) {
             for (Transaction t : transactions) {

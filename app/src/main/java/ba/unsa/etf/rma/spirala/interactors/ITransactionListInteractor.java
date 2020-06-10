@@ -15,4 +15,5 @@ public interface ITransactionListInteractor {
     void editTransaction(Context context, Transaction transaction);
     Transaction getTransaction(Context context, int id);
 
+    void editTransactionACD(Context context, Transaction izabranaTransakcija);
 }

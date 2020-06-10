@@ -39,6 +39,7 @@ public class TransactionDBOpenHelper extends SQLiteOpenHelper {
     public static final String TRANSACTION_DESCRIPTION = "description";
     public static final String TRANSACTION_INTERVAL = "transactionInterval";
     public static final String TRANSACTION_ENDDATE = "endDate";
+    public static final String TRANSACTION_OFFMODE = "offMode";
 
     public static final String TRANSACTION_TABLE_CREATE =
             "CREATE TABLE IF NOT EXISTS " + TRANSACTION_TABLE
@@ -51,7 +52,8 @@ public class TransactionDBOpenHelper extends SQLiteOpenHelper {
                     + TRANSACTION_TYPE + " INTEGER NOT NULL, "
                     + TRANSACTION_DESCRIPTION + " TEXT, "
                     + TRANSACTION_INTERVAL + " TEXT, "
-                    + TRANSACTION_ENDDATE + " TEXT);";
+                    + TRANSACTION_ENDDATE + " TEXT, "
+                    + TRANSACTION_OFFMODE + " TEXT);";
 
     private static final String TRANSACTION_DROP = "DROP TABLE IF EXISTS " + TRANSACTION_TABLE;
 

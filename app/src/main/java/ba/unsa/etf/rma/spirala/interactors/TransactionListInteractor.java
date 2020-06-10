@@ -139,7 +139,8 @@ public class TransactionListInteractor extends AsyncTask<String, Integer, Void> 
                 TransactionDBOpenHelper.TRANSACTION_TYPE,
                 TransactionDBOpenHelper.TRANSACTION_DESCRIPTION,
                 TransactionDBOpenHelper.TRANSACTION_INTERVAL,
-                TransactionDBOpenHelper.TRANSACTION_ENDDATE
+                TransactionDBOpenHelper.TRANSACTION_ENDDATE,
+                TransactionDBOpenHelper.TRANSACTION_OFFMODE
 
         };
         Uri adresa = Uri.parse("content://rma.provider.transactions/elements");
@@ -157,7 +158,8 @@ public class TransactionListInteractor extends AsyncTask<String, Integer, Void> 
             String trensactionDescription = cursor.getString(cursor.getColumnIndex(TransactionDBOpenHelper.TRANSACTION_DESCRIPTION));
             String transactionInterval = cursor.getString(cursor.getColumnIndex(TransactionDBOpenHelper.TRANSACTION_INTERVAL));
             String enddate = cursor.getString(cursor.getColumnIndex(TransactionDBOpenHelper.TRANSACTION_ENDDATE));
-            Transaction t = new Transaction(idTransaction, date, amount, title, typeId, trensactionDescription, transactionInterval, enddate);
+            String offMode = cursor.getString(cursor.getColumnIndex(TransactionDBOpenHelper.TRANSACTION_OFFMODE));
+            Transaction t = new Transaction(idTransaction, date, amount, title, typeId, trensactionDescription, transactionInterval, enddate, offMode);
             trans.add(t);
         }
         if (trans.size() != 0) {
@@ -205,6 +207,18 @@ public class TransactionListInteractor extends AsyncTask<String, Integer, Void> 
     }
 
     @Override
+    public void editTransactionACD(Context context, Transaction izabranaTransakcija) {
+        ContentResolver contentResolver = context.getApplicationContext().getContentResolver();
+        Uri adresa = Uri.parse("content://rma.provider.transactions/elements");
+        ContentValues contentValues = new ContentValues();
+
+        contentValues.put(TransactionDBOpenHelper.TRANSACTION_OFFMODE, izabranaTransakcija.getOffMode());
+        String where = TransactionDBOpenHelper.TRANSACTION_ID + "=" + izabranaTransakcija.getIdTransaction();
+        String[] whereArgs = null;
+        contentResolver.update(adresa, contentValues, where, whereArgs);
+    }
+
+    @Override
     public void saveTransaction(Transaction transaction, Context context) {
         ContentResolver contentResolver = context.getApplicationContext().getContentResolver();
         Uri adresa = Uri.parse("content://rma.provider.transactions/elements");
@@ -225,6 +239,7 @@ public class TransactionListInteractor extends AsyncTask<String, Integer, Void> 
             contentValues.put(TransactionDBOpenHelper.TRANSACTION_INTERVAL, transaction.getTransactionInterval());
             contentValues.put(TransactionDBOpenHelper.TRANSACTION_ENDDATE, dateFormat.format(transaction.getEndDate()));
         }
+        contentValues.put(TransactionDBOpenHelper.TRANSACTION_OFFMODE, "Offline dodavanje");
         contentResolver.insert(adresa, contentValues);
     }
 
@@ -246,6 +261,7 @@ public class TransactionListInteractor extends AsyncTask<String, Integer, Void> 
             contentValues.put(TransactionDBOpenHelper.TRANSACTION_INTERVAL, transaction.getTransactionInterval());
             contentValues.put(TransactionDBOpenHelper.TRANSACTION_ENDDATE, dateFormat.format(transaction.getEndDate()));
         }
+        contentValues.put(TransactionDBOpenHelper.TRANSACTION_OFFMODE, "Offline izmjena");
         String where = TransactionDBOpenHelper.TRANSACTION_ID + "=" + transaction.getIdTransaction();
         String[] whereArgs = null;
         contentResolver.update(adresa, contentValues, where, whereArgs);

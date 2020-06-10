@@ -56,6 +56,7 @@ public class TransactionDetail extends AppCompatActivity {
         offMode.setText(transaction.getOffMode());
         System.out.println(transaction.getOffMode() + " radi li ovo ? ");
 
+
         titleTransakcije.setText(transaction.getTitle());
         iznosTransakcije.setText(String.format("%.2f", transaction.getAmount()) + " BAM");
 
@@ -69,11 +70,42 @@ public class TransactionDetail extends AppCompatActivity {
         else endTransakcije.setText(transaction.getDate1(transaction.getEndDate()));
 
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
-        deleteButton.setOnClickListener(deleteTransactionOnClickListener);
+        if (transaction.getOffMode().equals("Offline brisanje")) {
+            deleteButton.setText("UNDO");
+            deleteButton.setOnClickListener(undoTransactionOnClickListener);
+        }
+        else deleteButton.setOnClickListener(deleteTransactionOnClickListener);
     }
 
     private Transaction transaction;
 
+    private View.OnClickListener undoTransactionOnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            final AlertDialog.Builder builder = new AlertDialog.Builder(TransactionDetail.this);
+            builder.setTitle("Select your answer.");
+            builder.setMessage("Want to undo delete action?");
+            DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    Intent intent = new Intent();
+                    switch (which) {
+                        case DialogInterface.BUTTON_POSITIVE:
+                            setResult(5, intent);
+                            break;
+                        case DialogInterface.BUTTON_NEGATIVE:
+                            setResult(6, intent);
+                            break;
+                    }
+                    finish();
+                }
+            };
+            builder.setPositiveButton("Yes", dialogClickListener);
+            builder.setNegativeButton("No", dialogClickListener);
+            AlertDialog dialog = builder.create();
+            dialog.show();
+        }
+    };
     private View.OnClickListener deleteTransactionOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {

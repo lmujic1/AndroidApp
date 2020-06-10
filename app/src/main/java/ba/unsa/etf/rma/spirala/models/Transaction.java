@@ -10,6 +10,7 @@ import java.util.Date;
 
 public class Transaction implements Serializable {
 
+
     public enum Type {
         REGULARPAYMENT("Regular payment"),
         REGULARINCOME("Regular income"),
@@ -97,6 +98,38 @@ public class Transaction implements Serializable {
         setItemDescription(itemDescription);
         setTransactionInterval(transactionInterval);
         setEndDate(endDate1);
+    }
+
+    public Transaction(int idTransaction, String date, double amount, String title, int type, String itemDescription, String transactionInterval, String endDate, String offMode) {
+        this.idTransaction = idTransaction;
+        Date date1 = pretvoriUDatum(date);
+        Date endDate1 = pretvoriUDatum(endDate);
+        this.date = date1;
+
+        this.amount = amount;
+        setTitle(title);
+        switch (type) {
+            case 1:
+                this.type = Type.REGULARPAYMENT;
+                break;
+            case 2:
+                this.type = Type.REGULARINCOME;
+                break;
+            case 3:
+                this.type = Type.PURCHASE;
+                break;
+            case 4:
+                this.type = Type.INDIVIDUALINCOME;
+                break;
+            case 5:
+                this.type = Type.INDIVIDUALPAYMENT;
+                break;
+        }
+        setItemDescription(itemDescription);
+        setTransactionInterval(transactionInterval);
+        setEndDate(endDate1);
+        if (offMode == null) this.offMode = "";
+        else this.offMode = offMode;
     }
 
     public String getOffMode() {

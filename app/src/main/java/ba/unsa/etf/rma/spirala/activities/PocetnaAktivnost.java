@@ -89,30 +89,13 @@ public class PocetnaAktivnost extends AppCompatActivity implements ITransactionL
             offlineEditovanje = new ArrayList<>();
     public static Account offlineAccount = new Account();
     private Boolean firstTimeOpen = true;
+    private Boolean firstTimeOpenS = true;
 
     @Override
     protected void onResume() {
         super.onResume();
         registerReceiver(connectivityBroadcastReceiver, filter);
         if (isNetworkAvailable()) {
-           /* getPresenter().getTransactionOnDate(defaultDate);
-            for (Transaction t : offlineDodavanje) {
-                getPresenter().addTransaction(t);
-
-                //editAccount(t,3);
-            }
-            for(Transaction t : offlineEditovanje) {
-                getPresenter().addTransaction(t);
-            }
-            offlineDodavanje.clear();
-            for (Transaction t : offlineBrisanje) {
-                getPresenter().deleteTransaction(t);
-                //getPresenter().deleteTransaction(t);
-            }
-            offlineBrisanje.clear();
-
-            getPresenter().getTransactionOnDate(defaultDate);
-            getInfoAboutAccount();*/
             refreshViewOnline();
         } else {
             refreshViewOffline();
@@ -291,7 +274,7 @@ public class PocetnaAktivnost extends AppCompatActivity implements ITransactionL
                 } else {
                     Toast.makeText(getApplicationContext(), "Offline brisanje", Toast.LENGTH_SHORT).show();
                     for (Transaction t : offlineDodavanje) {
-                        if (t.getIdTransaction() == (izabranaTransakcija.getIdTransaction()-1)) {
+                        if (t.getIdTransaction() == (izabranaTransakcija.getIdTransaction() - 1)) {
                             offlineDodavanje.remove(t);
                             break;
                         }
@@ -305,10 +288,11 @@ public class PocetnaAktivnost extends AppCompatActivity implements ITransactionL
                     }
 
                     izabranaTransakcija.setOffMode("Offline brisanje");
-                    offlineBrisanje.add(izabranaTransakcija);
+                    getPresenter().editTransactionAfterClickDelete(izabranaTransakcija);
+                    //offlineBrisanje.add(izabranaTransakcija);
 
                     //brisanje transakcije u DB
-                    getPresenter().deleteTransactionDB(izabranaTransakcija);
+                    //getPresenter().deleteTransactionDB(izabranaTransakcija);
 
                     //edit account DB
                     Transaction.Type tip = izabranaTransakcija.getType();
@@ -428,7 +412,7 @@ public class PocetnaAktivnost extends AppCompatActivity implements ITransactionL
                 } else {
                     Toast.makeText(getApplicationContext(), "Offline izmjena", Toast.LENGTH_SHORT).show();
                     for (Transaction t : offlineDodavanje) {
-                        if (t.getIdTransaction() == (izabranaTransakcija.getIdTransaction()-1)) {
+                        if (t.getIdTransaction() == (izabranaTransakcija.getIdTransaction() - 1)) {
                             offlineDodavanje.remove(t);
                             break;
                         }
@@ -463,7 +447,33 @@ public class PocetnaAktivnost extends AppCompatActivity implements ITransactionL
 
                 }
             }
+        } else if (resultCode == 5) {
+            izabranaTransakcija.setOffMode("");
+            for (Transaction t : offlineBrisanje) {
+                if (t.getIdTransaction() == izabranaTransakcija.getIdTransaction()) {
+                    offlineBrisanje.remove(t);
+                    //offlineDodavanje.add(t);
+                    if (!firstTimeOpenS) {
+                        offlineDodavanje.add(t);
+                    }
+                    break;
+                }
+            }
+            getPresenter().editTransactionAfterClickDelete(izabranaTransakcija);
+
+            Transaction.Type tip = izabranaTransakcija.getType();
+            int typei = izabranaTransakcija.getTypeId(tip);
+            double newBudget = offlineAccount.getBudget();
+            if (typei == 2 || typei == 4) {
+                newBudget += izabranaTransakcija.getAmount();
+            } else newBudget -= izabranaTransakcija.getAmount();
+            accountInteractor.editAccount(this, newBudget, offlineAccount.getMonthLimit(), offlineAccount.getTotalLimit());
+            getAccountFromDB();
+
+        } else if (resultCode == 6) {
+            getPresenter().deleteTransactionDB(izabranaTransakcija);
         }
+
     }
 
     //konekcija
@@ -480,19 +490,23 @@ public class PocetnaAktivnost extends AppCompatActivity implements ITransactionL
     }
 
     private void refreshViewOnline() {
+        if (firstTimeOpenS) {
+            firstTimeOpenS = false;
+        }
         getInfoAboutAccount();
         for (Transaction t : offlineDodavanje) {
             getPresenter().addTransaction(t);
         }
-        offlineDodavanje.clear();
+
         for (Transaction t : offlineEditovanje) {
             getPresenter().addTransaction(t);
         }
-        offlineEditovanje.clear();
+
         for (Transaction t : offlineBrisanje) {
             getPresenter().deleteTransaction(t);
         }
-        offlineBrisanje.clear();
+
+
 
         if (account != null && offlineAccount.getBudget() != 0) {
             String query = editAccountAfterOfflineMode();
@@ -502,6 +516,22 @@ public class PocetnaAktivnost extends AppCompatActivity implements ITransactionL
         }
         getInfoAboutAccount();
         getPresenter().getTransactionOnDate(defaultDate);
+        uredi();
+    }
+
+    private void uredi() {
+        for(Transaction t : offlineEditovanje) {
+            t.setOffMode("");
+            getPresenter().editTransactionAfterClickDelete(t);
+        }
+        for(Transaction t: offlineDodavanje) {
+            t.setOffMode("");
+            t.setIdTransaction(t.getIdTransaction()+1);
+            getPresenter().editTransactionAfterClickDelete(t);
+        }
+        offlineDodavanje.clear();
+        offlineEditovanje.clear();
+        offlineBrisanje.clear();
     }
 
     //view metode
@@ -517,13 +547,11 @@ public class PocetnaAktivnost extends AppCompatActivity implements ITransactionL
 
     @Override
     public void clearListOfTransactions() {
-        transactionListAdapter.clearList();
-    }
+        transactionListAdapter.clearList(); }
 
     @Override
     public void sort(String string) {
-        transactionListAdapter.sortiraj(string);
-    }
+        transactionListAdapter.sortiraj(string); }
 
     @Override
     public void removeTransaction(Transaction transaction) {
