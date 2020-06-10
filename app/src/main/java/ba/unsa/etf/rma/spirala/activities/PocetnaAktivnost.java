@@ -33,6 +33,7 @@ import ba.unsa.etf.rma.spirala.adapters.TransactionListAdapter;
 import ba.unsa.etf.rma.spirala.interactors.AccountInteractor;
 import ba.unsa.etf.rma.spirala.interactors.UpdateAccountInteractor;
 import ba.unsa.etf.rma.spirala.util.ConnectivityBroadcastReceiver;
+import ba.unsa.etf.rma.spirala.util.TransactionDBOpenHelper;
 import ba.unsa.etf.rma.spirala.views.ITransactionListView;
 import ba.unsa.etf.rma.spirala.models.Account;
 import ba.unsa.etf.rma.spirala.models.Transaction;
@@ -86,7 +87,7 @@ public class PocetnaAktivnost extends AppCompatActivity implements ITransactionL
     public static ArrayList<Transaction> offlineBrisanje = new ArrayList<>(),
             offlineDodavanje = new ArrayList<>(),
             offlineEditovanje = new ArrayList<>();
-    private static Account offlineAccount = new Account();
+    public static Account offlineAccount = new Account();
     private Boolean firstTimeOpen = true;
 
     @Override
@@ -289,8 +290,19 @@ public class PocetnaAktivnost extends AppCompatActivity implements ITransactionL
                     getInfoAboutAccount();
                 } else {
                     Toast.makeText(getApplicationContext(), "Offline brisanje", Toast.LENGTH_SHORT).show();
-                    offlineDodavanje.remove(izabranaTransakcija);
-                    offlineEditovanje.remove(izabranaTransakcija);
+                    for (Transaction t : offlineDodavanje) {
+                        if (t.getIdTransaction() == (izabranaTransakcija.getIdTransaction()-1)) {
+                            offlineDodavanje.remove(t);
+                            break;
+                        }
+                    }
+                    for (Transaction t : offlineEditovanje) {
+                        if (t.getTitle().equals(izabranaTransakcija.getTitle())
+                                && t.getAmount() == izabranaTransakcija.getAmount()) {
+                            offlineEditovanje.remove(t);
+                            break;
+                        }
+                    }
 
                     izabranaTransakcija.setOffMode("Offline brisanje");
                     offlineBrisanje.add(izabranaTransakcija);
@@ -351,6 +363,7 @@ public class PocetnaAktivnost extends AppCompatActivity implements ITransactionL
                     editAccount(nova, 3);
                     getInfoAboutAccount();
                 } else {
+                    nova.setIdTransaction(TransactionDBOpenHelper.idTransaction);
                     Toast.makeText(getApplicationContext(), "Offline dodavanje", Toast.LENGTH_SHORT).show();
                     nova.setOffMode("Offline dodavanje");
                     offlineDodavanje.add(nova);
@@ -414,10 +427,19 @@ public class PocetnaAktivnost extends AppCompatActivity implements ITransactionL
                     getInfoAboutAccount();
                 } else {
                     Toast.makeText(getApplicationContext(), "Offline izmjena", Toast.LENGTH_SHORT).show();
-                    offlineDodavanje.remove(izabranaTransakcija);
-                    offlineEditovanje.remove(izabranaTransakcija);
+                    for (Transaction t : offlineDodavanje) {
+                        if (t.getIdTransaction() == (izabranaTransakcija.getIdTransaction()-1)) {
+                            offlineDodavanje.remove(t);
+                            break;
+                        }
+                    }
+                    for (Transaction t : offlineEditovanje) {
+                        if (t.getIdTransaction() == izabranaTransakcija.getIdTransaction()) {
+                            offlineEditovanje.remove(t);
+                            break;
+                        }
+                    }
 
-                    izabranaTransakcija.setOffMode("Offline izmjena");
                     nova.setOffMode("Offline izmjena");
                     offlineEditovanje.add(nova);
 
@@ -468,11 +490,11 @@ public class PocetnaAktivnost extends AppCompatActivity implements ITransactionL
         }
         offlineEditovanje.clear();
         for (Transaction t : offlineBrisanje) {
-            getPresenter().deleteTransactionOff(t);
+            getPresenter().deleteTransaction(t);
         }
         offlineBrisanje.clear();
 
-        if (account != null) {
+        if (account != null && offlineAccount.getBudget() != 0) {
             String query = editAccountAfterOfflineMode();
             Intent i = new Intent(Intent.ACTION_SYNC, null, getApplicationContext(), UpdateAccountInteractor.class);
             i.putExtra("query", query);

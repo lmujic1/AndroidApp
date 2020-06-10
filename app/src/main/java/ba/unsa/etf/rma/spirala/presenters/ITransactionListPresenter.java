@@ -23,5 +23,4 @@ public interface ITransactionListPresenter {
 
     void getTransactionCursor();
 
-    void deleteTransactionOff(Transaction t);
 }

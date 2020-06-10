@@ -32,7 +32,6 @@ public class TransactionListPresenter implements ITransactionListPresenter, Tran
     }
 
 
-
     @Override
     public void getTransactions(String query) {
         new TransactionListInteractor((TransactionListInteractor.OnTransactionGetDone) this).execute(query);
@@ -214,21 +213,21 @@ public class TransactionListPresenter implements ITransactionListPresenter, Tran
 
     @Override
     public void addedTransactionDB(Transaction nova) {
-        transactionListInteractor.saveTransaction(nova,context);
+        transactionListInteractor.saveTransaction(nova, context);
         view.addTransaction(nova);
         view.notifyTransactionListDataSetChanged();
     }
 
     @Override
     public void deleteTransactionDB(Transaction izabranaTransakcija) {
-        transactionListInteractor.deleteTransaction(context,izabranaTransakcija.getIdTransaction());
+        transactionListInteractor.deleteTransaction(context, izabranaTransakcija.getIdTransaction());
         TransactionListAdapter.offlineMode.setText(izabranaTransakcija.getOffMode());
     }
 
     @Override
     public void editTransactionDB(Transaction stara, Transaction nova) {
-        transactionListInteractor.editTransaction(context,nova);
-        view.editingTransaction(stara,nova);
+        transactionListInteractor.editTransaction(context, nova);
+        view.editingTransaction(stara, nova);
         view.notifyTransactionListDataSetChanged();
     }
 
@@ -242,17 +241,28 @@ public class TransactionListPresenter implements ITransactionListPresenter, Tran
     @Override
     public void getTransactionCursor() {
         view.clearListOfTransactions();
-        view.setTransactions(transactionListInteractor.getTransactionCursor(context));
+        ArrayList<Transaction> transactions = transactionListInteractor.getTransactionCursor(context);
+        findTransactionForDeleteOff(transactions);
+        view.setTransactions(transactions);
         view.notifyTransactionListDataSetChanged();
     }
 
-    @Override
-    public void deleteTransactionOff(Transaction t) {
-        String query = "/" + t.getIdTransaction();
-        Intent intent = new Intent(Intent.ACTION_SYNC, null, context, TransactionDeleteInteractor.class);
-        intent.putExtra("query", query);
-        context.getApplicationContext().startService(intent);
+    private void findTransactionForDeleteOff(ArrayList<Transaction> transactions) {
+        if (PocetnaAktivnost.offlineBrisanje.size() != 0) {
+            for (Transaction t : transactions) {
+                for (Transaction t1 : PocetnaAktivnost.offlineBrisanje) {
+                    if (t.getAmount() == t1.getAmount()
+                            && t.getTitle().equals(t1.getTitle())
+                            && t.getDate().equals(t1.getDate())
+                            && t.getType().equals(t1.getType())) {
+                        t1.setIdTransaction(t.getIdTransaction());
+                        System.out.println(t.getIdTransaction() + "  cd  " + t1.getIdTransaction());
+                    }
+                }
+            }
+        }
     }
+
 
 
 }

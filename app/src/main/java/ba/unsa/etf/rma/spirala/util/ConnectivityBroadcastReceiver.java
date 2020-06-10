@@ -36,7 +36,7 @@ public class ConnectivityBroadcastReceiver extends BroadcastReceiver {
         } else {
             Toast toast = Toast.makeText(context, "Online mode", Toast.LENGTH_SHORT);
             toast.show();
-            if (PocetnaAktivnost.account != null) {
+            if (PocetnaAktivnost.account != null && PocetnaAktivnost.offlineAccount.getBudget() != 0) {
                 String query = PocetnaAktivnost.editAccountAfterOfflineMode();
                 Intent i = new Intent(Intent.ACTION_SYNC, null, context, UpdateAccountInteractor.class);
                 i.putExtra("query", query);
