@@ -61,7 +61,7 @@ public class TransactionListInteractor extends AsyncTask<String, Integer, Void> 
             try {
                 is.close();
             } catch (IOException e) {
-                //e.printStackTrace();
+                //e.printStackTrace();0
             }
         }
 

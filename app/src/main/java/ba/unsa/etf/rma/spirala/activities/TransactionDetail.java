@@ -69,7 +69,7 @@ public class TransactionDetail extends AppCompatActivity {
             endTransakcije.setText(transaction.getDate1(transaction.getDate()));
         else endTransakcije.setText(transaction.getDate1(transaction.getEndDate()));
 
-        AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
+        //AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
         if (transaction.getOffMode().equals("Offline brisanje")) {
             deleteButton.setText("UNDO");
             deleteButton.setOnClickListener(undoTransactionOnClickListener);
@@ -122,7 +122,7 @@ public class TransactionDetail extends AppCompatActivity {
                             finish();
                             break;
                         case DialogInterface.BUTTON_NEGATIVE:
-                            break;
+                             break;
                     }
                 }
             };

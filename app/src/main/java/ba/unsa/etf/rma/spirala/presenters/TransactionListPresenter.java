@@ -261,7 +261,7 @@ public class TransactionListPresenter implements ITransactionListPresenter, Tran
                             && t.getDate().equals(t1.getDate())
                             && t.getType().equals(t1.getType())) {
                         t1.setIdTransaction(t.getIdTransaction());
-                        System.out.println(t.getIdTransaction() + "  cd  " + t1.getIdTransaction());
+                        //System.out.println(t.getIdTransaction() + "  cd  " + t1.getIdTransaction());
                     }
                 }
             }
